@@ -1,8 +1,8 @@
 package co.jht.service;
 
-import co.jht.entity.User;
+import co.jht.entity.AppUser;
 
 public interface UserService {
-    User registeruser(User user);
-    User findByUsername(String username);
+    AppUser registerUser(AppUser AppUser);
+    AppUser findByUsername(String username);
 }

@@ -1,3 +1,10 @@
+logging:
+  file:
+    name: logs/logs.txt
+    path: logs
+  level:
+    root: INFO
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/todo_db

@@ -42,5 +42,4 @@ public class TaskServiceImpl implements TaskService {
     public List<TaskItem> getTasksByUserId(Long userId) {
         return taskRepository.findByUserId(userId);
     }
-
 }

@@ -1,7 +1,10 @@
 package co.jht.entity;
 
+import co.jht.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,7 +24,9 @@ public class AppUser {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String role;
+    @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
+    private UserRole role = UserRole.USER;
 
     public Long getId() {
         return id;
@@ -55,11 +60,11 @@ public class AppUser {
         this.email = email;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 }

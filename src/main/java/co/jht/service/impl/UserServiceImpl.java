@@ -1,6 +1,7 @@
 package co.jht.service.impl;
 
 import co.jht.entity.AppUser;
+import co.jht.enums.UserRole;
 import co.jht.repository.UserRepository;
 import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void registerUser(String username, String password, String email) {
-        AppUser appUser = new AppUser();
+        AppUser user = new AppUser();
 
-        appUser.setUsername(username);
-        appUser.setPassword(passwordEncoder.encode(password));
-        appUser.setEmail(email);
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(email);
+        user.setRole(setCustomUserRole(email));
 
-        userRepository.save(appUser);
+        userRepository.save(user);
     }
 
     @Override
@@ -44,4 +46,10 @@ public class UserServiceImpl implements UserService {
         return appUser != null && passwordEncoder.matches(password, appUser.getPassword());
     }
 
+    private UserRole setCustomUserRole(String emailDomain) {
+        if (emailDomain.endsWith("@tda.com")) {
+            return UserRole.ADMIN;
+        }
+        return UserRole.USER;
+    }
 }

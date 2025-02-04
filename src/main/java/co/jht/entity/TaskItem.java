@@ -13,7 +13,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+
+import static co.jht.constants.ApplicationConstants.ASIA_TOKYO;
 
 @Entity
 public class TaskItem {
@@ -49,7 +52,11 @@ public class TaskItem {
 
     @PrePersist
     public void prePersist() {
-        this.creationDate = ZonedDateTime.parse(this.creationDate.format(DateTimeFormatterUtil.getFormatter()));
+        if (this.creationDate == null) {
+            this.creationDate = ZonedDateTime.parse(ZonedDateTime.now(ZoneId.of(ASIA_TOKYO)).format(DateTimeFormatterUtil.getFormatter()));
+        } else {
+            this.creationDate = ZonedDateTime.parse(this.creationDate.format(DateTimeFormatterUtil.getFormatter()));
+        }
     }
 
     public Long getId() {

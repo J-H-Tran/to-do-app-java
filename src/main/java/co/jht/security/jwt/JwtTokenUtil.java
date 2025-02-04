@@ -21,7 +21,6 @@ public class JwtTokenUtil {
     private long expiration;
 
     public String generateToken(String username) {
-
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))

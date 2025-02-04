@@ -32,7 +32,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String jwt = getJwtFromRequest(request);
 
-        if (jwt != null && jwtTokenUtil.validateToken(jwt, userDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(jwt)).getUsername())) {
+        if (
+            jwt != null &&
+            jwtTokenUtil.validateToken(
+                jwt,
+                userDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(jwt)).getUsername()
+            )
+        ) {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(jwt)),
                 null,

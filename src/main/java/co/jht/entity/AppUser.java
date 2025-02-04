@@ -1,6 +1,7 @@
 package co.jht.entity;
 
 import co.jht.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,15 +16,19 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonProperty("username")
     @Column(nullable = false, unique = true)
     private String username;
 
+    @JsonProperty("password")
     @Column(nullable = false)
     private String password;
 
+    @JsonProperty("email")
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonProperty("role")
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private UserRole role = UserRole.USER;

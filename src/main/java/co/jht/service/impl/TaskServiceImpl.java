@@ -6,7 +6,11 @@ import co.jht.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
+
+import static co.jht.constants.Constants.ASIA_TOKYO;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -20,6 +24,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskItem createTask(TaskItem task) {
+        task.setCreationDate(ZonedDateTime.now(ZoneId.of(ASIA_TOKYO)));
         return taskRepository.save(task);
     }
 

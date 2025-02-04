@@ -30,8 +30,7 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/register", "/api/login").permitAll()
-                .requestMatchers("/api/user/**").permitAll()
+                .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/tasks/**").permitAll()
                 .anyRequest().authenticated()
             )

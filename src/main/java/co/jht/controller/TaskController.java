@@ -4,6 +4,7 @@ import co.jht.entity.TaskItem;
 import co.jht.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public ResponseEntity<List<TaskItem>> getTasksByUserId(
             @RequestHeader("X-User-Id") Long userId
@@ -34,6 +36,7 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ResponseEntity<TaskItem> createTask(
             @RequestBody TaskItem task
@@ -42,6 +45,7 @@ public class TaskController {
         return ResponseEntity.ok(createdTask);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping
     public ResponseEntity<TaskItem> updateTask(
             @RequestHeader("X-Task-Id") Long taskId,
@@ -52,6 +56,7 @@ public class TaskController {
         return ResponseEntity.ok(updatedTask);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping
     public ResponseEntity<Void> deleteTask(
             @RequestHeader("X-Task-Id") Long taskId

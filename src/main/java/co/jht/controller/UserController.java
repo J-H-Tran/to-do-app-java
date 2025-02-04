@@ -47,8 +47,14 @@ public class UserController {
     public ResponseEntity<String> login(
             @RequestBody AppUser user
     ) {
-        if (userService.authenticateUser(user.getUsername(), user.getPassword())) {
-            return ResponseEntity.ok("Login successful.");
+        String token = userService.authenticateUser(user.getUsername(), user.getPassword());
+
+        if (token != null) {
+            userService.loadUserByUsername(user.getUsername());
+
+            return ResponseEntity.ok()
+                    .header("Authorization", "Bearer " + token)
+                    .build();
         } else {
             return ResponseEntity.status(401).body("Invalid username or password!");
         }

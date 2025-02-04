@@ -10,7 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static co.jht.constants.Constants.ASIA_TOKYO;
+import static co.jht.constants.ApplicationConstants.ASIA_TOKYO;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -42,5 +42,4 @@ public class TaskServiceImpl implements TaskService {
     public List<TaskItem> getTasksByUserId(Long userId) {
         return taskRepository.findByUserId(userId);
     }
-
 }

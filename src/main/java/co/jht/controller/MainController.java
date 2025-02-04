@@ -2,12 +2,15 @@ package co.jht.controller;
 
 import co.jht.entity.AppUser;
 import co.jht.repository.UserRepository;
+import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class MainController {
@@ -15,10 +18,16 @@ public class MainController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/home")
     public String home(Model model) {
         model.addAttribute("message", "Welcome to the home page!");
-        return "welcome";
+        return "home";
     }
 
     @GetMapping("/register")
@@ -37,13 +46,13 @@ public class MainController {
         AppUser appUser = new AppUser();
 
         appUser.setUsername(username);
-        appUser.setPassword(password);
+        appUser.setPassword(passwordEncoder.encode(password));
         appUser.setEmail(email);
 
         userRepository.save(appUser);
 
         model.addAttribute("message", "Registration successful!");
-        return "welcome";
+        return "home";
     }
 
     @GetMapping("/login")
@@ -58,7 +67,21 @@ public class MainController {
             Model model
     ) {
         // Add logic to handle login (e.g., authenticate user)
+        AppUser appUser = userService.findByUsername(username);
+
+        if (appUser != null && passwordEncoder.matches(password, appUser.getPassword())) {
+            model.addAttribute("message", "Login successful!");
+        } else {
+            model.addAttribute("message", "Invalid username and password!");
+            return "login";
+        }
         model.addAttribute("message", "Login successful!");
-        return "welcome";
+        return "home";
+    }
+
+    @GetMapping("/loginSuccess")
+    public String loginSuccess(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("message", "Login successful!");
+        return "redirect:/home";
     }
 }

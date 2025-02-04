@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en-US">
 <head>
     <title>Register</title>
-    <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/styles.css}">
 </head>
 
 <body>
@@ -20,6 +20,7 @@
             <input type="email" id="email" name="email" required><br>
 
             <button type="submit" class="button">Register</button>
+            <p><a th:href="@{/home}">Back to Home</a></p>
         </form>
     </div>
 

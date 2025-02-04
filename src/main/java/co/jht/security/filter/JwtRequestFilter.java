@@ -1,6 +1,6 @@
-package co.jht.filter;
+package co.jht.security.filter;
 
-import co.jht.util.JwtTokenUtil;
+import co.jht.security.jwt.JwtTokenUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

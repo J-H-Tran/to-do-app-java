@@ -1,4 +1,4 @@
-package co.jht.util;
+package co.jht.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

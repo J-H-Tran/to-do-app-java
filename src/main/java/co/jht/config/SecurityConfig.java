@@ -1,7 +1,7 @@
 package co.jht.config;
 
-import co.jht.filter.JwtRequestFilter;
-import co.jht.util.JwtTokenUtil;
+import co.jht.security.filter.JwtRequestFilter;
+import co.jht.security.jwt.JwtTokenUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

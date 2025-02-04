@@ -4,7 +4,7 @@ import co.jht.entity.AppUser;
 import co.jht.enums.UserRole;
 import co.jht.repository.UserRepository;
 import co.jht.service.UserService;
-import co.jht.util.JwtTokenUtil;
+import co.jht.security.jwt.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

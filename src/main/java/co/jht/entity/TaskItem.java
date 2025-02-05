@@ -1,7 +1,6 @@
 package co.jht.entity;
 
 import co.jht.serializer.ZonedDateTimeSerializer;
-import co.jht.util.DateTimeFormatterUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Column;
@@ -12,13 +11,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 import static co.jht.constants.ApplicationConstants.ASIA_TOKYO;
+import static co.jht.util.DateTimeFormatterUtil.getFormatter;
 
 @Entity
+@Table(name = "task_item_table")
 public class TaskItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +37,12 @@ public class TaskItem {
 
     @JsonProperty("creation_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
-    @Column
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime creationDate;
 
     @JsonProperty("due_date")
-    @Column
+    @JsonSerialize(using = ZonedDateTimeSerializer.class)
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime dueDate;
 
     @JsonProperty("complete")
@@ -52,10 +56,17 @@ public class TaskItem {
 
     @PrePersist
     public void prePersist() {
-        if (this.creationDate == null) {
-            this.creationDate = ZonedDateTime.parse(ZonedDateTime.now(ZoneId.of(ASIA_TOKYO)).format(DateTimeFormatterUtil.getFormatter()));
-        } else {
-            this.creationDate = ZonedDateTime.parse(this.creationDate.format(DateTimeFormatterUtil.getFormatter()));
+        this.creationDate =
+                ZonedDateTime.parse(
+                    Objects.requireNonNullElseGet(
+                        this.creationDate,
+                        () -> ZonedDateTime.now(ZoneId.of(ASIA_TOKYO))
+                    ).format(getFormatter())
+                );
+
+        if (this.dueDate != null) {
+            this.dueDate = this.dueDate.withZoneSameInstant(ZoneId.of(ASIA_TOKYO))
+                    .withHour(0).withMinute(0).withSecond(0).withNano(0);
         }
     }
 

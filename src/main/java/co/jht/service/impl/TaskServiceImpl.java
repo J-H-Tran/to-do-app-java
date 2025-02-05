@@ -40,6 +40,14 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskItem> getTasksByUserId(Long userId) {
-        return taskRepository.findByUserId(userId);
+        return taskRepository.findByUserIdOrderById(userId).stream()
+                .peek(task -> {
+                    task.setCreationDate(task.getCreationDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
+
+                    if (task.getDueDate() != null) {
+                      task.setDueDate(task.getDueDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
+                    }
+                })
+                .toList();
     }
 }

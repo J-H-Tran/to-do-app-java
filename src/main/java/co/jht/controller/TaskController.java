@@ -1,6 +1,8 @@
 package co.jht.controller;
 
-import co.jht.entity.TaskItem;
+import co.jht.entity.tasks.TaskCompleteStatus;
+import co.jht.entity.tasks.TaskDueDate;
+import co.jht.entity.tasks.TaskItem;
 import co.jht.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -63,5 +66,26 @@ public class TaskController {
     ) {
         taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/due_date")
+    public ResponseEntity<TaskItem> updateTaskDueDate(
+            @RequestHeader("X-Task-Id") Long taskId,
+            @RequestBody TaskDueDate taskDueDate
+    ) {
+        TaskItem updateTask = taskService.updateTaskDueDate(taskId, taskDueDate.getDueDate());
+        return ResponseEntity.ok(updateTask);
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/complete_status")
+    public ResponseEntity<TaskItem> updateCompleteStatus(
+            @RequestHeader("X-Task-Id") Long taskId,
+            @RequestBody TaskCompleteStatus taskCompleteStatus
+    ) {
+        boolean compStatus = taskCompleteStatus.getCompleteStatus();
+        TaskItem updateTask = taskService.updateTaskCompleteStatus(taskId, compStatus);
+        return ResponseEntity.ok(updateTask);
     }
 }

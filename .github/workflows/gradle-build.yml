@@ -1,4 +1,4 @@
-name: Gradle Build Test Check
+name: Gradle Build
 
 on:
   pull_request:

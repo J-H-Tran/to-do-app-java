@@ -31,3 +31,5 @@ jobs:
 
     - name: Clean up
       run: rm -rf build
+
+    retention-days: 7 # default 90 days

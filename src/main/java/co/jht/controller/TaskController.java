@@ -1,5 +1,6 @@
 package co.jht.controller;
 
+import co.jht.entity.tasks.TaskCompleteStatus;
 import co.jht.entity.tasks.TaskDueDate;
 import co.jht.entity.tasks.TaskItem;
 import co.jht.service.TaskService;
@@ -74,6 +75,17 @@ public class TaskController {
             @RequestBody TaskDueDate taskDueDate
     ) {
         TaskItem updateTask = taskService.updateTaskDueDate(taskId, taskDueDate.getDueDate());
+        return ResponseEntity.ok(updateTask);
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/complete_status")
+    public ResponseEntity<TaskItem> updateCompleteStatus(
+            @RequestHeader("X-Task-Id") Long taskId,
+            @RequestBody TaskCompleteStatus taskCompleteStatus
+    ) {
+        boolean compStatus = taskCompleteStatus.getCompleteStatus();
+        TaskItem updateTask = taskService.updateTaskCompleteStatus(taskId, compStatus);
         return ResponseEntity.ok(updateTask);
     }
 }

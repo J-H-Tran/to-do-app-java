@@ -66,4 +66,17 @@ public class TaskServiceImpl implements TaskService {
             throw new TaskNotFoundException("Task not found with id: " + taskId);
         }
     }
+
+    public TaskItem updateTaskCompleteStatus(Long taskId, boolean completeStatus) {
+        Optional<TaskItem> taskOptional = taskRepository.findById(taskId);
+
+        if (taskOptional.isPresent()) {
+            TaskItem task = taskOptional.get();
+            task.setComplete(completeStatus);
+
+            return taskRepository.save(task);
+        } else {
+            throw new TaskNotFoundException("Task not found with id: " + taskId);
+        }
+    }
 }

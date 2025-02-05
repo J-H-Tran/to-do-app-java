@@ -11,4 +11,5 @@ public interface TaskService {
     void deleteTask(Long taskId);
     List<TaskItem> getTasksByUserId(Long userId);
     TaskItem updateTaskDueDate(Long taskId, ZonedDateTime dueDate);
+    TaskItem updateTaskCompleteStatus(Long taskId, boolean completeStatus);
 }

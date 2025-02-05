@@ -5,12 +5,9 @@ on:
     branches:
       - master
       - develop
-  push:
-    branches:
-      - "**"
 
 # Push checks are only performed when there is an open pull request the workflow will only run on pushes to branches
-# that have an open pull request targeting the develop branch (include when readme.md is created)
+# that have an open pull request targeting the develop branch - include when readme.md is created
 jobs:
   build:
     if: github.event_name == 'pull_request' || github.event_name == 'push' && github.event.pull_request != null
@@ -34,5 +31,3 @@ jobs:
 
     - name: Clean up
       run: rm -rf build
-
-    retention-days: 7 # default 90

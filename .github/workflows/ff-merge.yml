@@ -4,7 +4,9 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - develop
+      - master
+
+permissions: write-all
 
 jobs:
   fast-forward-merge:
@@ -22,10 +24,10 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Fast-forward merge develop into master
+      - name: Fast-forward merge master into develop
         run: |
-          git checkout master
-          git merge --ff-only develop
-          git push origin master
+          git checkout develop
+          git merge --ff-only master
+          git push origin develop
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

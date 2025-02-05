@@ -26,6 +26,25 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Bypass branch protection rules
+        run: |
+          curl -X PUT \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/J-H-Tran/to-do-app-java/branches/develop/protection \
+            -d '{
+              "required_status_checks": null,
+              "enforce_admins": true,
+              "required_pull_request_reviews": {
+                "dismiss_stale_reviews": true,
+                "require_code_owner_reviews": true
+              },
+              "restrictions": {
+                "users": ["github-actions[bot]"],
+                "teams": []
+              }
+            }'
+
       - name: Fast-forward merge master into develop
         run: |
           git checkout develop

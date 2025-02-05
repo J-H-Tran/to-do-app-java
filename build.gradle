@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.0'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'co.jht'
@@ -12,20 +12,27 @@ repositories {
 }
 
 dependencies {
+    // SpringBoot
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-
-    implementation 'org.postgresql:postgresql:42.7.2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    testImplementation 'org.junit:junit-bom:5.10.0'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // JUnit
+    testImplementation 'org.junit:junit-bom:5.11.4'
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // PostgreSQL
+    implementation 'org.postgresql:postgresql:42.7.2'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 }
 
 test {

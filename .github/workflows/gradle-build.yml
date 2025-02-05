@@ -5,6 +5,9 @@ on:
     branches:
       - master
       - develop
+  push:
+    branches:
+      - "**"
 
 # Push checks are only performed when there is an open pull request the workflow will only run on pushes to branches
 # that have an open pull request targeting the develop branch (include when readme.md is created)

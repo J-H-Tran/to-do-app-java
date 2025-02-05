@@ -18,14 +18,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    user:
+      name: ${SECURITY_USER_NAME}
+      password: ${SECURITY_PASSWORD}
+
 
 server:
   port: 8080
-
-security:
-  user:
-    name: ${SECURITY_USER_NAME}
-    password: ${SECURITY_PASSWORD}
 
 jwt:
   secret: ${JWT_SECRET}

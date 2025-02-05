@@ -38,13 +38,14 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/**").permitAll()
-                .requestMatchers("/tasks/**").permitAll()
+                .requestMatchers("/api/**", "/tasks/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+            .formLogin(withDefaults())
             .httpBasic(withDefaults())
             .addFilterBefore(
                 new JwtRequestFilter(

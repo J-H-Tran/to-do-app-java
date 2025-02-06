@@ -11,10 +11,9 @@ public class AppUserMapper {
         if (user == null) {
             return null;
         }
-
         AppUserDTO appUserDTO = new AppUserDTO();
-        appUserDTO.setAppUserId(user.getId());
-        appUserDTO.setUserName(user.getUserName());
+        appUserDTO.setUsername(user.getUsername());
+        appUserDTO.setPassword(user.getPassword());
         appUserDTO.setEmail(user.getEmail());
         appUserDTO.setFirstName(user.getFirstName());
         appUserDTO.setLastName(user.getLastName());
@@ -30,10 +29,9 @@ public class AppUserMapper {
         if (userDTO == null) {
             return null;
         }
-
         AppUser appUser = new AppUser();
-        appUser.setId(userDTO.getAppUserId());
-        appUser.setUserName(userDTO.getUserName());
+        appUser.setUsername(userDTO.getUsername());
+        appUser.setPassword(userDTO.getPassword());
         appUser.setEmail(userDTO.getEmail());
         appUser.setFirstName(userDTO.getFirstName());
         appUser.setLastName(userDTO.getLastName());

@@ -1,8 +1,10 @@
 package co.jht.model.domain.persist.entity.tasks;
 
 import co.jht.model.domain.persist.entity.appuser.AppUser;
+import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +21,6 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import static co.jht.constants.ApplicationConstants.ASIA_TOKYO;
-import static co.jht.util.DateTimeFormatterUtil.getFormatter;
 
 @Entity
 @Table(name = "task_item_table")
@@ -38,11 +39,13 @@ public class TaskItem {
 
     @JsonProperty("creation_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime creationDate;
 
     @JsonProperty("due_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime dueDate;
 
@@ -57,13 +60,10 @@ public class TaskItem {
 
     @PrePersist
     public void prePersist() {
-        this.creationDate =
-                ZonedDateTime.parse(
-                    Objects.requireNonNullElseGet(
-                        this.creationDate,
-                        () -> ZonedDateTime.now(ZoneId.of(ASIA_TOKYO))
-                    ).format(getFormatter())
-                );
+        this.creationDate = Objects.requireNonNullElseGet(
+                this.creationDate,
+                () -> ZonedDateTime.now(ZoneId.of(ASIA_TOKYO))
+        );
 
         if (this.dueDate != null) {
             this.dueDate = this.dueDate.withZoneSameInstant(ZoneId.of(ASIA_TOKYO))

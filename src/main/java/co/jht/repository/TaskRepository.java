@@ -1,6 +1,6 @@
 package co.jht.repository;
 
-import co.jht.entity.tasks.TaskItem;
+import co.jht.model.domain.persist.entity.tasks.TaskItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -2,8 +2,10 @@ package co.jht.model.domain.persist.entity.appuser;
 
 import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
+import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,14 +16,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import static co.jht.constants.ApplicationConstants.ASIA_TOKYO;
+import static co.jht.enums.UserRole.USER;
 import static co.jht.enums.UserStatus.ACTIVE;
-import static co.jht.util.DateTimeFormatterUtil.getFormatter;
 
 @Entity
 @Table(name = "app_user_table")
@@ -30,9 +33,9 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty("user_name")
+    @JsonProperty("username")
     @Column(nullable = false, unique = true)
-    private String userName;
+    private String username;
 
     @JsonProperty("password")
     @Column(nullable = false)
@@ -52,10 +55,11 @@ public class AppUser {
 
     @JsonProperty("profile_picture_url")
     @Column(nullable = false)
-    private String profilePictureUrl;
+    private String profilePictureUrl = "http://default.jpg";
 
     @JsonProperty("registration_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime registrationDate;
 
@@ -66,17 +70,18 @@ public class AppUser {
     @JsonProperty("role")
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
-    private UserRole role = UserRole.USER;
+    private UserRole role = USER;
+
+    @Version
+    @Column(nullable = false)
+    private Long version;
 
     @PrePersist
     public void prePersist() {
-        this.registrationDate =
-                ZonedDateTime.parse(
-                    Objects.requireNonNullElseGet(
-                        this.registrationDate,
-                        () -> ZonedDateTime.now(ZoneId.of(ASIA_TOKYO))
-                    ).format(getFormatter())
-                );
+        this.registrationDate = Objects.requireNonNullElseGet(
+                this.registrationDate,
+                () -> ZonedDateTime.now(ZoneId.of(ASIA_TOKYO))
+        );
     }
 
     public Long getId() {
@@ -87,12 +92,12 @@ public class AppUser {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -157,5 +162,13 @@ public class AppUser {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

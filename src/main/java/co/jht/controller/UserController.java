@@ -1,62 +1,112 @@
 package co.jht.controller;
 
-import co.jht.entity.AppUser;
+import co.jht.model.domain.persist.entity.appuser.AppUser;
+import co.jht.model.domain.response.dto.appuser.AppUserDTO;
+import co.jht.model.domain.response.dto.mapper.AppUserMapper;
 import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
+    private final AppUserMapper appUserMapper;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AppUserMapper appUserMapper) {
         this.userService = userService;
+        this.appUserMapper = appUserMapper;
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<AppUser> getUser(
-            @RequestHeader("X-Username") String username
-    ) {
-        AppUser user = userService.findByUsername(username);
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public ResponseEntity<List<AppUserDTO>> getAllUsers() {
+        List<AppUser> users = userService.getAllUsers();
+        List<AppUserDTO> userDTOs = users.stream()
+                .map(appUserMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDTOs);
+    }
 
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<AppUserDTO> getUserById(@PathVariable Long userId) {
+        AppUser user = userService.getUserById(userId);
+        return ResponseEntity.ok(appUserMapper.toDTO(user));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<AppUserDTO> createUser(
+            @RequestBody AppUserDTO userDTO
+    ) {
+        AppUser user = appUserMapper.toEntity(userDTO);
+        AppUser createdUser = userService.createUser(userDTO);
+        return ResponseEntity.ok(appUserMapper.toDTO(createdUser));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<AppUserDTO> updateUser(
+            @PathVariable Long userId,
+            @RequestBody AppUserDTO userDTO
+    ) {
+        AppUser user = appUserMapper.toEntity(userDTO);
+        user.setId(userId);
+
+        AppUser updatedUser = userService.updateUser(user);
+        return ResponseEntity.ok(appUserMapper.toDTO(updatedUser));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(
-            @RequestBody AppUser user
-    ) {
-        userService.registerUser(user.getUsername(), user.getPassword(), user.getEmail());
-        return ResponseEntity.ok("Registration successful.");
+    public ResponseEntity<Void> registerUser(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String email) {
+        userService.registerUser(username, password, email);
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(
-            @RequestBody AppUser user
+    @PostMapping("/authenticate")
+    public ResponseEntity<String> authenticateUser(
+            @RequestParam String username,
+            @RequestParam String password
     ) {
-        String token = userService.authenticateUser(user.getUsername(), user.getPassword());
+        String token = userService.authenticateUser(username, password);
 
         if (token != null) {
-            userService.loadUserByUsername(user.getUsername());
-
             return ResponseEntity.ok()
                     .header("Authorization", "Bearer " + token)
                     .build();
-        } else {
-            return ResponseEntity.status(401).body("Invalid username or password!");
         }
+        return ResponseEntity.status(401).build();
+    }
+
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<AppUserDTO> getUserProfile(@PathVariable String username) {
+        AppUser user = userService.findByUsername(username);
+        return ResponseEntity.ok(appUserMapper.toDTO(user));
     }
 }

@@ -1,7 +1,7 @@
 package co.jht.service.impl;
 
-import co.jht.entity.tasks.TaskItem;
 import co.jht.exception.TaskNotFoundException;
+import co.jht.model.domain.persist.entity.tasks.TaskItem;
 import co.jht.repository.TaskRepository;
 import co.jht.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public List<TaskItem> getTasksByUserId(Long userId) {
+        return taskRepository.findByUserIdOrderById(userId).stream()
+                .peek(task -> {
+                    task.setCreationDate(task.getCreationDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
+
+                    if (task.getDueDate() != null) {
+                        task.setDueDate(task.getDueDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
+                    }
+                })
+                .toList();
+    }
+
+    @Override
     public TaskItem createTask(TaskItem task) {
         task.setCreationDate(ZonedDateTime.now(ZoneId.of(ASIA_TOKYO)));
         return taskRepository.save(task);
@@ -41,19 +54,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskItem> getTasksByUserId(Long userId) {
-        return taskRepository.findByUserIdOrderById(userId).stream()
-                .peek(task -> {
-                    task.setCreationDate(task.getCreationDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
-
-                    if (task.getDueDate() != null) {
-                      task.setDueDate(task.getDueDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
-                    }
-                })
-                .toList();
-    }
-
-    @Override
     public TaskItem updateTaskDueDate(Long taskId, ZonedDateTime dueDate) {
         Optional<TaskItem> taskOptional = taskRepository.findById(taskId);
 
@@ -67,12 +67,13 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    @Override
     public TaskItem updateTaskCompleteStatus(Long taskId, boolean completeStatus) {
         Optional<TaskItem> taskOptional = taskRepository.findById(taskId);
 
         if (taskOptional.isPresent()) {
             TaskItem task = taskOptional.get();
-            task.setComplete(completeStatus);
+            task.setCompleteStatus(completeStatus);
 
             return taskRepository.save(task);
         } else {

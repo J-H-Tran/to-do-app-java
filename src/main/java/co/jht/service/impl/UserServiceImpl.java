@@ -2,17 +2,18 @@ package co.jht.service.impl;
 
 import co.jht.enums.UserRole;
 import co.jht.model.domain.persist.entity.appuser.AppUser;
-import co.jht.model.domain.response.dto.appuser.AppUserDTO;
 import co.jht.model.domain.response.dto.mapper.AppUserMapper;
 import co.jht.repository.UserRepository;
 import co.jht.security.jwt.JwtTokenUtil;
 import co.jht.service.UserService;
+import co.jht.util.DateTimeFormatterUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +47,8 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        return new User(user.getUserName(), user.getPassword(), Collections.emptyList());
+        // Initialize the user in the UserDetail context
+        return new User(user.getUsername(), user.getPassword(), Collections.emptyList());
     }
 
     @Override
@@ -60,15 +62,22 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
     }
 
+    @Transactional
     @Override
-    public AppUser createUser(AppUserDTO userDTO) {
-        AppUser user = appUserMapper.toEntity(userDTO);
+    public AppUser createUser(AppUser user) {
+        if (user.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        } else {
+            throw new IllegalArgumentException("Password cannot be null!");
+        }
+        user.setRegistrationDate(DateTimeFormatterUtil.getCurrentTokyoTime());
         return userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public AppUser updateUser(AppUser user) {
-        return userRepository.save(user);
+        return userRepository.save(updateUserDetails(user));
     }
 
     @Override
@@ -79,8 +88,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerUser(String username, String password, String email) {
         AppUser user = new AppUser();
-
-        user.setUserName(username);
+        user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
         user.setRole(setCustomUserRole(email));
@@ -108,5 +116,21 @@ public class UserServiceImpl implements UserService {
             return UserRole.ADMIN;
         }
         return UserRole.USER;
+    }
+
+    private AppUser updateUserDetails(AppUser user) {
+        AppUser existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        existingUser.setEmail(user.getEmail());
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setProfilePictureUrl(user.getProfilePictureUrl());
+        existingUser.setRegistrationDate(user.getRegistrationDate());
+        existingUser.setAccountStatus(user.getAccountStatus());
+        existingUser.setRole(user.getRole());
+
+        return existingUser;
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +34,7 @@ public class TaskController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<TaskItemDTO>> getTasksByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<TaskItemDTO>> getTasksByUserId(@PathVariable("userId") Long userId) {
         List<TaskItem> tasks = taskService.getTasksByUserId(userId);
         List<TaskItemDTO> taskDTOs = tasks.stream()
                 .map(taskItemMapper::toDTO)
@@ -53,7 +52,8 @@ public class TaskController {
 
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/{taskId}")
-    public ResponseEntity<TaskItemDTO> updateTask(@PathVariable Long taskId, @RequestBody TaskItemDTO taskDTO) {
+    public ResponseEntity<TaskItemDTO> updateTask(@PathVariable("taskId") Long taskId,
+                                                  @RequestBody TaskItemDTO taskDTO) {
         TaskItem task = taskItemMapper.toEntity(taskDTO);
         task.setId(taskId);
         TaskItem updatedTask = taskService.updateTask(task);
@@ -62,14 +62,14 @@ public class TaskController {
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(@RequestHeader("X-Task-Id") Long taskId) {
+    public ResponseEntity<Void> deleteTask(@PathVariable("taskId") Long taskId) {
         taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/{taskId}/due_date")
-    public ResponseEntity<TaskItemDTO> updateTaskDueDate(@PathVariable Long taskId, @RequestBody TaskItemDTO taskDTO) {
+    public ResponseEntity<TaskItemDTO> updateTaskDueDate(@PathVariable("taskId") Long taskId, @RequestBody TaskItemDTO taskDTO) {
         TaskItem updateTask = taskService.updateTaskDueDate(taskId, taskDTO.getDueDate());
         return ResponseEntity.ok(taskItemMapper.toDTO(updateTask));
     }

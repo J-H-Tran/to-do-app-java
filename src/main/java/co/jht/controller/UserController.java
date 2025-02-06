@@ -45,7 +45,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public ResponseEntity<AppUserDTO> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<AppUserDTO> getUserById(@PathVariable("id") Long userId) {
         AppUser user = userService.getUserById(userId);
         return ResponseEntity.ok(appUserMapper.toDTO(user));
     }
@@ -56,14 +56,14 @@ public class UserController {
             @RequestBody AppUserDTO userDTO
     ) {
         AppUser user = appUserMapper.toEntity(userDTO);
-        AppUser createdUser = userService.createUser(userDTO);
+        AppUser createdUser = userService.createUser(user);
         return ResponseEntity.ok(appUserMapper.toDTO(createdUser));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<AppUserDTO> updateUser(
-            @PathVariable Long userId,
+            @PathVariable("id") Long userId,
             @RequestBody AppUserDTO userDTO
     ) {
         AppUser user = appUserMapper.toEntity(userDTO);
@@ -75,7 +75,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
@@ -97,15 +97,18 @@ public class UserController {
         String token = userService.authenticateUser(username, password);
 
         if (token != null) {
+            // load user to current session context
+            userService.loadUserByUsername(username);
             return ResponseEntity.ok()
                     .header("Authorization", "Bearer " + token)
                     .build();
         }
-        return ResponseEntity.status(401).build();
+        return ResponseEntity.status(401).body("Invalid username or password!");
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/profile/{username}")
-    public ResponseEntity<AppUserDTO> getUserProfile(@PathVariable String username) {
+    public ResponseEntity<AppUserDTO> getUserProfile(@PathVariable("username") String username) {
         AppUser user = userService.findByUsername(username);
         return ResponseEntity.ok(appUserMapper.toDTO(user));
     }

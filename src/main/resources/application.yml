@@ -30,3 +30,8 @@ server:
 jwt:
   secret: ${JWT_SECRET}
   expiration: 3600
+
+app:
+  first-user:
+    name: ${FIRST_USER_NAME}
+    password: ${FIRST_USER_PASSWORD}

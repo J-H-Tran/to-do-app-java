@@ -1,7 +1,11 @@
 package co.jht.config;
 
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.NonNull;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
@@ -15,12 +19,21 @@ public class TransactionConfig implements TransactionManagementConfigurer {
 
     private final PlatformTransactionManager transactionManager;
 
-    public TransactionConfig(PlatformTransactionManager transactionManager) {
+    public TransactionConfig(@Lazy PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+    @NonNull
     @Override
     public PlatformTransactionManager annotationDrivenTransactionManager() {
+        return transactionManager;
+    }
+
+    @Bean
+    @Lazy
+    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory);
         return transactionManager;
     }
 

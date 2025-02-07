@@ -38,10 +38,14 @@ dependencies {
     // PostgreSQL
     implementation 'org.postgresql:postgresql:42.7.2'
 
+    // Hikari
+    implementation 'com.zaxxer:HikariCP:6.2.1'
+
     // JWT
     implementation "io.jsonwebtoken:jjwt-api:${jwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jwtVersion}"
+
 }
 
 test {

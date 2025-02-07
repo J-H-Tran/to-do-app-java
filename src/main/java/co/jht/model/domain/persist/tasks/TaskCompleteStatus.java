@@ -1,4 +1,4 @@
-package co.jht.model.domain.persist.entity.tasks;
+package co.jht.model.domain.persist.tasks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

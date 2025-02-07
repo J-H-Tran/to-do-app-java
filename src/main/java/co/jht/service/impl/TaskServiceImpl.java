@@ -1,7 +1,7 @@
 package co.jht.service.impl;
 
 import co.jht.exception.TaskNotFoundException;
-import co.jht.model.domain.persist.entity.tasks.TaskItem;
+import co.jht.model.domain.persist.tasks.TaskItem;
 import co.jht.repository.TaskRepository;
 import co.jht.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;

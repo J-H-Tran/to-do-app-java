@@ -2,7 +2,7 @@ package co.jht.config;
 
 import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
-import co.jht.model.domain.persist.entity.appuser.AppUser;
+import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.repository.UserRepository;
 import co.jht.util.DateTimeFormatterUtil;
 import jakarta.annotation.PostConstruct;

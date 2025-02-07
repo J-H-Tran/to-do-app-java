@@ -1,7 +1,7 @@
-package co.jht.model.domain.response.dto.mapper;
+package co.jht.model.domain.response.mapper;
 
-import co.jht.model.domain.persist.entity.appuser.AppUser;
-import co.jht.model.domain.response.dto.appuser.AppUserDTO;
+import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.response.appuser.AppUserDTO;
 import org.springframework.stereotype.Component;
 
 @Component

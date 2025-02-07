@@ -1,6 +1,6 @@
-package co.jht.model.domain.persist.entity.tasks;
+package co.jht.model.domain.persist.tasks;
 
-import co.jht.model.domain.persist.entity.appuser.AppUser;
+import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;

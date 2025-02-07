@@ -1,4 +1,4 @@
-package co.jht.model.domain.response.dto.tasks;
+package co.jht.model.domain.response.tasks;
 
 import co.jht.serializer.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;

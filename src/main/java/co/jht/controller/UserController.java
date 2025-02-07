@@ -1,8 +1,8 @@
 package co.jht.controller;
 
-import co.jht.model.domain.persist.entity.appuser.AppUser;
-import co.jht.model.domain.response.dto.appuser.AppUserDTO;
-import co.jht.model.domain.response.dto.mapper.AppUserMapper;
+import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.response.appuser.AppUserDTO;
+import co.jht.model.domain.response.mapper.AppUserMapper;
 import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

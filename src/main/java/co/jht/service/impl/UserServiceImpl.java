@@ -1,8 +1,8 @@
 package co.jht.service.impl;
 
 import co.jht.enums.UserRole;
-import co.jht.model.domain.persist.entity.appuser.AppUser;
-import co.jht.model.domain.response.dto.mapper.AppUserMapper;
+import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.response.mapper.AppUserMapper;
 import co.jht.repository.UserRepository;
 import co.jht.security.jwt.JwtTokenUtil;
 import co.jht.service.UserService;

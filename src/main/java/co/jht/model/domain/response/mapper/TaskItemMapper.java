@@ -1,7 +1,7 @@
-package co.jht.model.domain.response.dto.mapper;
+package co.jht.model.domain.response.mapper;
 
-import co.jht.model.domain.persist.entity.tasks.TaskItem;
-import co.jht.model.domain.response.dto.tasks.TaskItemDTO;
+import co.jht.model.domain.persist.tasks.TaskItem;
+import co.jht.model.domain.response.tasks.TaskItemDTO;
 import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

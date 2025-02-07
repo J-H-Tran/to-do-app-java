@@ -1,4 +1,4 @@
-package co.jht.model.domain.persist.entity.tasks;
+package co.jht.model.domain.persist.tasks;
 
 import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;

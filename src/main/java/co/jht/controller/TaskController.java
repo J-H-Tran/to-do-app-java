@@ -1,8 +1,8 @@
 package co.jht.controller;
 
-import co.jht.model.domain.persist.entity.tasks.TaskItem;
-import co.jht.model.domain.response.dto.mapper.TaskItemMapper;
-import co.jht.model.domain.response.dto.tasks.TaskItemDTO;
+import co.jht.model.domain.persist.tasks.TaskItem;
+import co.jht.model.domain.response.mapper.TaskItemMapper;
+import co.jht.model.domain.response.tasks.TaskItemDTO;
 import co.jht.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

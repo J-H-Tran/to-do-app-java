@@ -1,6 +1,6 @@
 package co.jht.service;
 
-import co.jht.model.domain.persist.entity.tasks.TaskItem;
+import co.jht.model.domain.persist.tasks.TaskItem;
 
 import java.time.ZonedDateTime;
 import java.util.List;

@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public class AuthUsernameUtil {
 
-    public static String getCurrentUsername() {
+    public static String getAuthUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = null;
 

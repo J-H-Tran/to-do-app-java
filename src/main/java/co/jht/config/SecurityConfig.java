@@ -38,8 +38,10 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/users/**", "/tasks/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/users/**").hasRole("ADMIN")
+                .requestMatchers("/users/profile/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/tasks/**").hasAnyRole("ADMIN", "USER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -48,10 +50,7 @@ public class SecurityConfig {
             .formLogin(withDefaults())
             .httpBasic(withDefaults())
             .addFilterBefore(
-                new JwtRequestFilter(
-                    jwtTokenUtil,
-                    userDetailsService
-                ),
+                new JwtRequestFilter(jwtTokenUtil, userDetailsService),
                 UsernamePasswordAuthenticationFilter.class
             );
 

@@ -4,6 +4,7 @@ import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
 import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
+import co.jht.util.DateTimeFormatterUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -18,11 +19,9 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-import static co.jht.constants.ApplicationConstants.ASIA_TOKYO;
 import static co.jht.enums.UserRole.USER;
 import static co.jht.enums.UserStatus.ACTIVE;
 
@@ -80,7 +79,7 @@ public class AppUser {
     public void prePersist() {
         this.registrationDate = Objects.requireNonNullElseGet(
                 this.registrationDate,
-                () -> ZonedDateTime.now(ZoneId.of(ASIA_TOKYO))
+                DateTimeFormatterUtil::getCurrentTokyoTime
         );
     }
 

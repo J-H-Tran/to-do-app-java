@@ -3,6 +3,7 @@ package co.jht.model.domain.persist.tasks;
 import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
+import co.jht.util.DateTimeFormatterUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -62,7 +63,7 @@ public class TaskItem {
     public void prePersist() {
         this.creationDate = Objects.requireNonNullElseGet(
                 this.creationDate,
-                () -> ZonedDateTime.now(ZoneId.of(ASIA_TOKYO))
+                DateTimeFormatterUtil::getCurrentTokyoTime
         );
 
         if (this.dueDate != null) {

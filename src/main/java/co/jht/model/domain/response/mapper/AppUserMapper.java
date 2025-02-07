@@ -2,6 +2,8 @@ package co.jht.model.domain.response.mapper;
 
 import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.model.domain.response.appuser.AppUserDTO;
+import co.jht.model.domain.response.appuser.AppUserLoginDTO;
+import co.jht.model.domain.response.appuser.AppUserRegisterDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,35 +13,60 @@ public class AppUserMapper {
         if (user == null) {
             return null;
         }
-        AppUserDTO appUserDTO = new AppUserDTO();
-        appUserDTO.setUsername(user.getUsername());
-        appUserDTO.setPassword(user.getPassword());
-        appUserDTO.setEmail(user.getEmail());
-        appUserDTO.setFirstName(user.getFirstName());
-        appUserDTO.setLastName(user.getLastName());
-        appUserDTO.setProfilePictureUrl(user.getProfilePictureUrl());
-        appUserDTO.setRegistrationDate(user.getRegistrationDate());
-        appUserDTO.setAccountStatus(user.getAccountStatus());
-        appUserDTO.setRole(user.getRole());
+        AppUserDTO dto = new AppUserDTO();
+        dto.setUsername(user.getUsername());
+        dto.setPassword(user.getPassword());
+        dto.setEmail(user.getEmail());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setProfilePictureUrl(user.getProfilePictureUrl());
+        dto.setRegistrationDate(user.getRegistrationDate());
+        dto.setAccountStatus(user.getAccountStatus());
+        dto.setRole(user.getRole());
 
-        return appUserDTO;
+        return dto;
     }
 
-    public AppUser toEntity(AppUserDTO userDTO) {
-        if (userDTO == null) {
+    public AppUser toEntity(AppUserDTO dto) {
+        if (dto == null) {
             return null;
         }
-        AppUser appUser = new AppUser();
-        appUser.setUsername(userDTO.getUsername());
-        appUser.setPassword(userDTO.getPassword());
-        appUser.setEmail(userDTO.getEmail());
-        appUser.setFirstName(userDTO.getFirstName());
-        appUser.setLastName(userDTO.getLastName());
-        appUser.setProfilePictureUrl(userDTO.getProfilePictureUrl());
-        appUser.setRegistrationDate(userDTO.getRegistrationDate());
-        appUser.setAccountStatus(userDTO.getAccountStatus());
-        appUser.setRole(userDTO.getRole());
+        AppUser user = new AppUser();
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setProfilePictureUrl(dto.getProfilePictureUrl());
+        user.setRegistrationDate(dto.getRegistrationDate());
+        user.setAccountStatus(dto.getAccountStatus());
+        user.setRole(dto.getRole());
 
-        return appUser;
+        return user;
+    }
+
+    public AppUser toEntity(AppUserRegisterDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        AppUser user = new AppUser();
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+
+        return user;
+    }
+
+    public AppUser toEntity(AppUserLoginDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        AppUser user = new AppUser();
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+
+        return user;
     }
 }

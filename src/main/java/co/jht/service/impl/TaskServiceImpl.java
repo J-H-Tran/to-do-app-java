@@ -4,6 +4,7 @@ import co.jht.exception.TaskNotFoundException;
 import co.jht.model.domain.persist.tasks.TaskItem;
 import co.jht.repository.TaskRepository;
 import co.jht.service.TaskService;
+import co.jht.util.DateTimeFormatterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskItem createTask(TaskItem task) {
-        task.setCreationDate(ZonedDateTime.now(ZoneId.of(ASIA_TOKYO)));
+        task.setCreationDate(DateTimeFormatterUtil.getCurrentTokyoTime());
         return taskRepository.save(task);
     }
 

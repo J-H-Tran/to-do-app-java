@@ -3,6 +3,8 @@ package co.jht.config;
 import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
 import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.persist.tasks.TaskItem;
+import co.jht.repository.TaskRepository;
 import co.jht.repository.UserRepository;
 import co.jht.util.DateTimeFormatterUtil;
 import jakarta.annotation.PostConstruct;
@@ -11,10 +13,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
+
 @Component
 public class DataInitializer {
 
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.first-user.name}")
@@ -24,8 +29,13 @@ public class DataInitializer {
     private String userPassword;
 
     @Autowired
-    public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public DataInitializer(
+            UserRepository userRepository,
+            TaskRepository taskRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
+        this.taskRepository = taskRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -34,6 +44,18 @@ public class DataInitializer {
         if (userRepository.count() == 0) {
             createUser(username, userPassword, "admin@tda.com", "FirstAdmin", "LastAdmin", UserRole.ADMIN);
             createUser("regularUser", "regularPass", "regular@user.com", "FirstUser", "LastUser", UserRole.USER);
+        }
+
+        if (taskRepository.count() == 0) {
+            AppUser adminUser = userRepository.findByUsername(username);
+            AppUser regularUser = userRepository.findByUsername("regularUser");
+
+            createTask("First Task", "Task description 1", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false, regularUser);
+            createTask("Second Task", "Task description 2", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false, regularUser);
+            createTask("Third Task", "Task description 3", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false,
+                    adminUser);
+            createTask("Fourth Task", "Task description 4", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false,
+                    adminUser);
         }
     }
 
@@ -58,5 +80,24 @@ public class DataInitializer {
         user.setVersion(0L);
 
         userRepository.save(user);
+    }
+
+    private void createTask(
+            String title,
+            String description,
+            ZonedDateTime creationDate,
+            ZonedDateTime dueDate,
+            boolean completeStatus,
+            AppUser user
+    ) {
+        TaskItem task = new TaskItem();
+        task.setTitle(title);
+        task.setDescription(description);
+        task.setCreationDate(creationDate);
+        task.setDueDate(dueDate);
+        task.setCompleteStatus(completeStatus);
+        task.setUser(user);
+
+        taskRepository.save(task);
     }
 }

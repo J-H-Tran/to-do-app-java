@@ -6,9 +6,12 @@ import co.jht.repository.UserRepository;
 import co.jht.security.jwt.JwtTokenUtil;
 import co.jht.service.UserService;
 import co.jht.util.DateTimeFormatterUtil;
+import co.jht.util.LogAuthUserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -48,12 +51,17 @@ public class UserServiceImpl implements UserService {
             logger.error("User not found with username: {}", username);
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
+        // Convert roles to GrantedAuthority
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+
         // Initialize the user in the UserDetail context
-        return new User(user.getUsername(), user.getPassword(), Collections.emptyList());
+        return new User(user.getUsername(), user.getPassword(), Collections.singleton(grantedAuthority));
     }
 
     @Override
     public List<AppUser> getAllUsers() {
+        String authorities = LogAuthUserRole.logAuthenticatedUserRoles().toString();
+        logger.info("Users listed authorities: {}", authorities);
         return userRepository.findAll();
     }
 
@@ -91,12 +99,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(String username, String password, String email) {
-        AppUser user = new AppUser();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setEmail(email);
-        user.setRole(setCustomUserRole(email));
+    public void registerUser(AppUser user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(setCustomUserRole(user.getEmail()));
 
         userRepository.save(user);
     }
@@ -107,14 +112,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String authenticateUser(String username, String password) {
-        AppUser user = userRepository.findByUsername(username);
+    public String authenticateUser(AppUser user) {
+        AppUser userCreds = userRepository.findByUsername(user.getUsername());
 
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            logger.info("User authenticated successfully: {}", username);
-            return jwtTokenUtil.generateToken(username);
+        if (userCreds != null && passwordEncoder.matches(user.getPassword(), userCreds.getPassword())) {
+            logger.info("User authenticated successfully: {}", userCreds.getUsername());
+            return jwtTokenUtil.generateToken(userCreds.getUsername());
         }
-        logger.error("Authentication failed for user: {}", username);
+        logger.error("Authentication failed for user: {}", user.getUsername());
         return null;
     }
 

@@ -1,6 +1,7 @@
 package co.jht.model.domain.response.mapper;
 
 import co.jht.model.domain.persist.tasks.TaskItem;
+import co.jht.model.domain.response.tasks.TaskItemCreateDTO;
 import co.jht.model.domain.response.tasks.TaskItemDTO;
 import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,16 @@ public class TaskItemMapper {
         task.setDueDate(dto.getDueDate());
         task.setCompleteStatus(dto.getCompleteStatus());
         task.setUser(userService.getUserById(dto.getUserId()));
+
+        return task;
+    }
+
+    public TaskItem toEntity(TaskItemCreateDTO dto) {
+        TaskItem task = new TaskItem();
+        task.setTitle(dto.getTitle());
+        task.setDescription(dto.getDescription());
+        task.setDueDate(dto.getDueDate());
+        task.setCompleteStatus(dto.getCompleteStatus());
 
         return task;
     }

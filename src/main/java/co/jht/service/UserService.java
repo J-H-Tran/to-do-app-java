@@ -9,7 +9,7 @@ public interface UserService extends UserDetailsService {
     List<AppUser> getAllUsers();
     AppUser getUserById(Long userId);
     AppUser createUser(AppUser user);
-    AppUser updateUser(AppUser user);
+    AppUser updateUser(AppUser user, String username);
     void deleteUser(Long userId);
     void registerUser(AppUser user);
     AppUser findByUsername(String username);

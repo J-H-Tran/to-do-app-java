@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.ZonedDateTime;
 
-public class AppUserDTO {
+public class AppUserDTO implements AppUserDTOBase {
     @JsonProperty("username")
     private String username;
 

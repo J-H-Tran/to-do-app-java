@@ -4,11 +4,13 @@ import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.model.domain.response.appuser.AppUserDTO;
 import co.jht.model.domain.response.appuser.AppUserLoginDTO;
 import co.jht.model.domain.response.appuser.AppUserRegisterDTO;
+import co.jht.model.domain.response.appuser.AppUserUpdateDTO;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppUserMapper {
+public class AppUserMapper implements BaseMapper<AppUser, AppUserDTO> {
 
+    @Override
     public AppUserDTO toDTO(AppUser user) {
         if (user == null) {
             return null;
@@ -27,6 +29,7 @@ public class AppUserMapper {
         return dto;
     }
 
+    @Override
     public AppUser toEntity(AppUserDTO dto) {
         if (dto == null) {
             return null;
@@ -66,6 +69,19 @@ public class AppUserMapper {
         AppUser user = new AppUser();
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword());
+
+        return user;
+    }
+
+    public AppUser toEntity(AppUserUpdateDTO dto) {
+        AppUser user = new AppUser();
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setProfilePictureUrl(dto.getProfilePictureUrl());
+        user.setAccountStatus(dto.getAccountStatus());
 
         return user;
     }

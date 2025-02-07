@@ -1,8 +1,9 @@
 package co.jht.model.domain.response.appuser;
 
+import co.jht.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AppUserRegisterDTO implements AppUserDTOBase {
+public class AppUserUpdateDTO implements AppUserDTOBase {
     @JsonProperty("username")
     private String username;
 
@@ -17,6 +18,12 @@ public class AppUserRegisterDTO implements AppUserDTOBase {
 
     @JsonProperty("last_name")
     private String lastName;
+
+    @JsonProperty("profile_picture_url")
+    private String profilePictureUrl;
+
+    @JsonProperty("account_status")
+    private UserStatus accountStatus;
 
     public String getUsername() {
         return username;
@@ -56,5 +63,21 @@ public class AppUserRegisterDTO implements AppUserDTOBase {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public UserStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(UserStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 }

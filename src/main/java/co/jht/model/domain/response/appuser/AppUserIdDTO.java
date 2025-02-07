@@ -2,7 +2,7 @@ package co.jht.model.domain.response.appuser;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AppUserIdDTO {
+public class AppUserIdDTO implements AppUserDTOBase {
     @JsonProperty("user_id")
     private Long id;
 

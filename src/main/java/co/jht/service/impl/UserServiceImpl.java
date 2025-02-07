@@ -6,7 +6,6 @@ import co.jht.repository.UserRepository;
 import co.jht.security.jwt.JwtTokenUtil;
 import co.jht.service.UserService;
 import co.jht.util.DateTimeFormatterUtil;
-import co.jht.util.LogAuthUserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,14 +53,12 @@ public class UserServiceImpl implements UserService {
         // Convert roles to GrantedAuthority
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
 
-        // Initialize the user in the UserDetail context
+        // Initialize the user in the UserDetails
         return new User(user.getUsername(), user.getPassword(), Collections.singleton(grantedAuthority));
     }
 
     @Override
     public List<AppUser> getAllUsers() {
-        String authorities = LogAuthUserRole.logAuthenticatedUserRoles().toString();
-        logger.info("Users listed authorities: {}", authorities);
         return userRepository.findAll();
     }
 
@@ -89,8 +86,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public AppUser updateUser(AppUser user) {
-        return userRepository.save(updateUserDetails(user));
+    public AppUser updateUser(AppUser user, String authUsername) {
+        return userRepository.save(updateUserDetails(user, authUsername));
     }
 
     @Override
@@ -130,22 +127,16 @@ public class UserServiceImpl implements UserService {
         return UserRole.USER;
     }
 
-    private AppUser updateUserDetails(AppUser user) {
-        AppUser existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> {
-                    logger.error("User not found with id: {}", user.getId());
-                    return new IllegalArgumentException("User not found");
-                });
-        existingUser.setUsername(user.getUsername());
-        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        existingUser.setEmail(user.getEmail());
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setProfilePictureUrl(user.getProfilePictureUrl());
-        existingUser.setRegistrationDate(user.getRegistrationDate());
-        existingUser.setAccountStatus(user.getAccountStatus());
-        existingUser.setRole(user.getRole());
+    private AppUser updateUserDetails(AppUser user, String authUsername) {
+        AppUser savedUser = userRepository.findByUsername(authUsername);
+        savedUser.setUsername(user.getUsername());
+        savedUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        savedUser.setEmail(user.getEmail());
+        savedUser.setFirstName(user.getFirstName());
+        savedUser.setLastName(user.getLastName());
+        savedUser.setProfilePictureUrl(user.getProfilePictureUrl());
+        savedUser.setAccountStatus(user.getAccountStatus());
 
-        return existingUser;
+        return savedUser;
     }
 }

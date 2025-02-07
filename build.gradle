@@ -23,13 +23,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    // SpringDoc OpenAPI
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
-    implementation "org.springdoc:springdoc-openapi-starter-common:${springDocVersion}"
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // SpringDoc OpenAPI
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
+    implementation "org.springdoc:springdoc-openapi-starter-common:${springDocVersion}"
 
     // JUnit
     testImplementation 'org.junit:junit-bom:5.11.4'

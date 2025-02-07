@@ -2,11 +2,12 @@ package co.jht.service.impl;
 
 import co.jht.enums.UserRole;
 import co.jht.model.domain.persist.appuser.AppUser;
-import co.jht.model.domain.response.mapper.AppUserMapper;
 import co.jht.repository.UserRepository;
 import co.jht.security.jwt.JwtTokenUtil;
 import co.jht.service.UserService;
 import co.jht.util.DateTimeFormatterUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,22 +22,21 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
-    private final AppUserMapper appUserMapper;
 
     @Autowired
     public UserServiceImpl(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            JwtTokenUtil jwtTokenUtil,
-            AppUserMapper appUserMapper
+            JwtTokenUtil jwtTokenUtil
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
-        this.appUserMapper = appUserMapper;
     }
 
     // from UserDetailService
@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
         AppUser user = userRepository.findByUsername(username);
 
         if (user == null) {
+            logger.error("User not found with username: {}", username);
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
         // Initialize the user in the UserDetail context
@@ -59,7 +60,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public AppUser getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> {
+                    logger.error("User not found with id: {}", userId);
+                    return new UsernameNotFoundException("User not found with id: " + userId);
+                });
     }
 
     @Transactional
@@ -68,6 +72,7 @@ public class UserServiceImpl implements UserService {
         if (user.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         } else {
+            logger.error("Password cannot be null for user: {}", user.getUsername());
             throw new IllegalArgumentException("Password cannot be null!");
         }
         user.setRegistrationDate(DateTimeFormatterUtil.getCurrentTokyoTime());
@@ -106,8 +111,10 @@ public class UserServiceImpl implements UserService {
         AppUser user = userRepository.findByUsername(username);
 
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            logger.info("User authenticated successfully: {}", username);
             return jwtTokenUtil.generateToken(username);
         }
+        logger.error("Authentication failed for user: {}", username);
         return null;
     }
 
@@ -120,7 +127,10 @@ public class UserServiceImpl implements UserService {
 
     private AppUser updateUserDetails(AppUser user) {
         AppUser existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User not found with id: {}", user.getId());
+                    return new IllegalArgumentException("User not found");
+                });
         existingUser.setUsername(user.getUsername());
         existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         existingUser.setEmail(user.getEmail());

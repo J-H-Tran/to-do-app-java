@@ -4,6 +4,8 @@ import co.jht.exception.TaskNotFoundException;
 import co.jht.model.domain.persist.tasks.TaskItem;
 import co.jht.repository.TaskRepository;
 import co.jht.service.TaskService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ import static co.jht.constants.ApplicationConstants.ASIA_TOKYO;
 
 @Service
 public class TaskServiceImpl implements TaskService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
     private final TaskRepository taskRepository;
 
@@ -63,6 +67,7 @@ public class TaskServiceImpl implements TaskService {
 
             return taskRepository.save(task);
         } else {
+            logger.error("Task not found with id: {}", taskId);
             throw new TaskNotFoundException("Task not found with id: " + taskId);
         }
     }
@@ -77,6 +82,7 @@ public class TaskServiceImpl implements TaskService {
 
             return taskRepository.save(task);
         } else {
+            logger.error("Task not found with id: {}", taskId);
             throw new TaskNotFoundException("Task not found with id: " + taskId);
         }
     }

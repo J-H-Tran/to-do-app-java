@@ -7,6 +7,12 @@ plugins {
 group = 'co.jht'
 version = '1.0-SNAPSHOT'
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -32,8 +38,13 @@ dependencies {
     implementation "org.springdoc:springdoc-openapi-starter-common:${springDocVersion}"
 
     // JUnit
-    testImplementation 'org.junit:junit-bom:5.11.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    // Mockito
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+
 
     // PostgreSQL
     implementation 'org.postgresql:postgresql:42.7.2'

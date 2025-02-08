@@ -5,6 +5,11 @@ logging:
   level:
     root: INFO
 
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/todo_db
@@ -23,14 +28,27 @@ spring:
       ddl-auto: update
     show-sql: true
     open-in-view: false
-
+    properties:
+      hibernate:
+        transaction:
+          jta:
+            platform: org.springframework.transaction.jta.JtaTransactionManager
+  web:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
   security:
     user:
       name: ${SECURITY_USER_NAME}
       password: ${SECURITY_PASSWORD}
 
-server:
-  port: 8080
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 jwt:
   secret: ${JWT_SECRET}

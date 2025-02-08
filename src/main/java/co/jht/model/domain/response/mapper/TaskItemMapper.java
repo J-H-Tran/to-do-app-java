@@ -5,6 +5,7 @@ import co.jht.model.domain.response.tasks.TaskItemCreateDTO;
 import co.jht.model.domain.response.tasks.TaskItemCreatedDTO;
 import co.jht.model.domain.response.tasks.TaskItemDTO;
 import co.jht.model.domain.response.tasks.TaskItemListedDTO;
+import co.jht.model.domain.response.tasks.TaskItemUpdateDTO;
 import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,12 +26,13 @@ public class TaskItemMapper {
     public TaskItemDTO toDTO(TaskItem task) {
         TaskItemDTO dto = new TaskItemDTO();
         dto.setTaskId(task.getId());
+        dto.setTaskCode(task.getTaskCode());
         dto.setTitle(task.getTitle());
         dto.setDescription(task.getDescription());
         dto.setCreationDate(task.getCreationDate());
         dto.setDueDate(task.getDueDate());
         dto.setCompleteStatus(task.getCompleteStatus());
-        dto.setUserId(task.getId());
+        dto.setUserId(task.getUser().getId());
         return dto;
     }
 
@@ -70,6 +72,16 @@ public class TaskItemMapper {
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
         task.setDueDate(dto.getDueDate());
+        return task;
+    }
+
+    public TaskItem toEntity(TaskItemUpdateDTO dto) {
+        TaskItem task = new TaskItem();
+        task.setTaskCode(dto.getTaskCode());
+        task.setTitle(dto.getTitle());
+        task.setDescription(dto.getDescription());
+        task.setDueDate(dto.getDueDate());
+        task.setCompleteStatus(dto.getCompleteStatus());
         return task;
     }
 

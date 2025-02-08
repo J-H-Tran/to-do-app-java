@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -46,6 +47,10 @@ public class TaskItem {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
+
+    @Version
+    @Column(nullable = false)
+    private Long version;
 
     @PrePersist
     public void prePersist() {
@@ -122,5 +127,13 @@ public class TaskItem {
 
     public void setUser(AppUser user) {
         this.user = user;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

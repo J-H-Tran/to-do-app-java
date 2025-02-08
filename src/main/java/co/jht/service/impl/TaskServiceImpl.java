@@ -76,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskItem updateTask(TaskItem task) {
-        return taskRepository.save(task);
+        return taskRepository.save(updateTaskDetails(task));
     }
 
     @Override
@@ -116,6 +116,21 @@ public class TaskServiceImpl implements TaskService {
 
     private AppUser getLoginUser() {
         return userRepository.findByUsername(AuthUserUtil.getAuthUsername());
+    }
+
+    private TaskItem updateTaskDetails(TaskItem task) {
+        String username = AuthUserUtil.getAuthUsername();
+
+        TaskItem updatedTask = taskRepository.findByTaskCode(task.getTaskCode())
+                .orElseThrow(() ->
+                        new TaskNotFoundException("Task not found with task code: " + task.getTaskCode()));
+        updatedTask.setTaskCode(task.getTaskCode());
+        updatedTask.setTitle(task.getTitle());
+        updatedTask.setDescription(task.getDescription());
+        updatedTask.setDueDate(task.getDueDate());
+        updatedTask.setCompleteStatus(task.getCompleteStatus());
+        updatedTask.setUser(userRepository.findByUsername(username));
+        return updatedTask;
     }
 
 }

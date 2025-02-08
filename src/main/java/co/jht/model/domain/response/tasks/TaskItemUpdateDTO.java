@@ -8,9 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.ZonedDateTime;
 
-public class TaskItemDTO {
-    private Long taskId;
-
+public class TaskItemUpdateDTO {
     @JsonProperty("task_code")
     private String taskCode;
 
@@ -20,11 +18,6 @@ public class TaskItemDTO {
     @JsonProperty("description")
     private String description;
 
-    @JsonProperty("creation_date")
-    @JsonSerialize(using = ZonedDateTimeSerializer.class)
-    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
-    private ZonedDateTime creationDate;
-
     @JsonProperty("due_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
     @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
@@ -32,17 +25,6 @@ public class TaskItemDTO {
 
     @JsonProperty("complete_status")
     private boolean completeStatus;
-
-    @JsonProperty("user_id")
-    private Long userId;
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
 
     public String getTaskCode() {
         return taskCode;
@@ -68,14 +50,6 @@ public class TaskItemDTO {
         this.description = description;
     }
 
-    public ZonedDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(ZonedDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public ZonedDateTime getDueDate() {
         return dueDate;
     }
@@ -90,13 +64,5 @@ public class TaskItemDTO {
 
     public void setCompleteStatus(boolean completeStatus) {
         this.completeStatus = completeStatus;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 }

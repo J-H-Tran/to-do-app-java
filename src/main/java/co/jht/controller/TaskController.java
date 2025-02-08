@@ -6,9 +6,9 @@ import co.jht.model.domain.response.tasks.TaskItemCreateDTO;
 import co.jht.model.domain.response.tasks.TaskItemCreatedDTO;
 import co.jht.model.domain.response.tasks.TaskItemDTO;
 import co.jht.model.domain.response.tasks.TaskItemListedDTO;
+import co.jht.model.domain.response.tasks.TaskItemUpdateDTO;
 import co.jht.model.domain.response.tasks.TaskItemUserIdDTO;
 import co.jht.service.TaskService;
-import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,17 +27,14 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-    private final UserService userService;
     private final TaskItemMapper taskItemMapper;
 
     @Autowired
     public TaskController(
             TaskService taskService,
-            UserService userService,
             TaskItemMapper taskItemMapper
     ) {
         this.taskService = taskService;
-        this.userService = userService;
         this.taskItemMapper = taskItemMapper;
     }
 
@@ -49,25 +46,21 @@ public class TaskController {
         return ResponseEntity.ok(taskDTOs);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<TaskItemCreatedDTO> createTask(@RequestBody TaskItemCreateDTO taskDTO) {
         TaskItem task = taskItemMapper.toEntity(taskDTO);
         TaskItem createdTask = taskService.createTask(task);
         return ResponseEntity.ok(taskItemMapper.toCreatedDTO(createdTask));
     }
 
-    @PutMapping("/{taskId}")
-    public ResponseEntity<TaskItemDTO> updateTask(
-            @PathVariable("taskId") Long taskId,
-            @RequestBody TaskItemDTO taskDTO
-    ) {
+    @PutMapping("/update")
+    public ResponseEntity<TaskItemDTO> updateTask(@RequestBody TaskItemUpdateDTO taskDTO) {
         TaskItem task = taskItemMapper.toEntity(taskDTO);
-        task.setId(taskId);
         TaskItem updatedTask = taskService.updateTask(task);
         return ResponseEntity.ok(taskItemMapper.toDTO(updatedTask));
     }
 
-    @DeleteMapping("/{taskId}")
+    @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteTask(@PathVariable("taskId") Long taskId) {
         taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build();

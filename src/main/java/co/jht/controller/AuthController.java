@@ -1,6 +1,7 @@
 package co.jht.controller;
 
 import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.response.RegisterResponseDTO;
 import co.jht.model.domain.response.appuser.AppUserLoginDTO;
 import co.jht.model.domain.response.appuser.AppUserRegisterDTO;
 import co.jht.model.domain.response.mapper.AppUserMapper;
@@ -27,10 +28,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registerUser(@RequestBody AppUserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<RegisterResponseDTO> registerUser(@RequestBody AppUserRegisterDTO userRegisterDTO) {
         AppUser newUser = appUserMapper.toEntity(userRegisterDTO);
         userService.registerUser(newUser);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        RegisterResponseDTO response = new RegisterResponseDTO("User registered successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/authenticate")

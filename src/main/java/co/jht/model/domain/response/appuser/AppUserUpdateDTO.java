@@ -1,14 +1,9 @@
-package co.jht.model.domain.response.dto.appuser;
+package co.jht.model.domain.response.appuser;
 
-import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
-import co.jht.serializer.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.time.ZonedDateTime;
-
-public class AppUserDTO {
+public class AppUserUpdateDTO implements AppUserDTOBase {
     @JsonProperty("username")
     private String username;
 
@@ -27,15 +22,8 @@ public class AppUserDTO {
     @JsonProperty("profile_picture_url")
     private String profilePictureUrl;
 
-    @JsonProperty("registration_date")
-    @JsonSerialize(using = ZonedDateTimeSerializer.class)
-    private ZonedDateTime registrationDate;
-
     @JsonProperty("account_status")
     private UserStatus accountStatus;
-
-    @JsonProperty("role")
-    private UserRole role;
 
     public String getUsername() {
         return username;
@@ -85,27 +73,11 @@ public class AppUserDTO {
         this.profilePictureUrl = profilePictureUrl;
     }
 
-    public ZonedDateTime getRegistrationDate() {
-        return registrationDate;
-    }
-
-    public void setRegistrationDate(ZonedDateTime registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
     public UserStatus getAccountStatus() {
         return accountStatus;
     }
 
     public void setAccountStatus(UserStatus accountStatus) {
         this.accountStatus = accountStatus;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
     }
 }

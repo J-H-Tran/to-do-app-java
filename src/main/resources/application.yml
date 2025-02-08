@@ -5,27 +5,59 @@ logging:
   level:
     root: INFO
 
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store-type: JKS
+    key-store: src/main/resources/ode-https.jks
+    key-store-password: password
+    key-password: password
+    key-alias: ode-https
+  http:
+    port: 8080
+  error:
+    include-stacktrace: never
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/todo_db
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      pool-name: HikariPool-1
+      max-lifetime: 1800000
+      connection-timeout: 30000
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        transaction:
+          jta:
+            platform: org.springframework.transaction.jta.JtaTransactionManager
+  web:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
   security:
     user:
       name: ${SECURITY_USER_NAME}
       password: ${SECURITY_PASSWORD}
 
-
-server:
-  port: 8080
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 jwt:
   secret: ${JWT_SECRET}

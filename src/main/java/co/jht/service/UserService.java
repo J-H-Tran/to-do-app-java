@@ -1,6 +1,6 @@
 package co.jht.service;
 
-import co.jht.model.domain.persist.entity.appuser.AppUser;
+import co.jht.model.domain.persist.appuser.AppUser;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
@@ -9,9 +9,9 @@ public interface UserService extends UserDetailsService {
     List<AppUser> getAllUsers();
     AppUser getUserById(Long userId);
     AppUser createUser(AppUser user);
-    AppUser updateUser(AppUser user);
-    void deleteUser(Long userId);
-    void registerUser(String username, String password, String email);
+    AppUser updateUser(AppUser user, String username);
+    void deleteUser(String username);
+    void registerUser(AppUser user);
     AppUser findByUsername(String username);
-    String authenticateUser(String username, String password);
+    String authenticateUser(AppUser user);
 }

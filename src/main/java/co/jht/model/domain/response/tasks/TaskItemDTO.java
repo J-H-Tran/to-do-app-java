@@ -1,82 +1,55 @@
-package co.jht.model.domain.persist.entity.tasks;
+package co.jht.model.domain.response.tasks;
 
-import co.jht.model.domain.persist.entity.appuser.AppUser;
 import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
-import static co.jht.constants.ApplicationConstants.ASIA_TOKYO;
+public class TaskItemDTO {
+    private Long taskId;
 
-@Entity
-@Table(name = "task_item_table")
-public class TaskItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @JsonProperty("task_code")
+    private String taskCode;
 
     @JsonProperty("title")
-    @Column(nullable = false)
     private String title;
 
     @JsonProperty("description")
-    @Column
     private String description;
 
     @JsonProperty("creation_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
     @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
-    @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime creationDate;
 
     @JsonProperty("due_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
     @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
-    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime dueDate;
 
     @JsonProperty("complete_status")
-    @Column(nullable = false)
-    private boolean completeStatus = false;
+    private boolean completeStatus;
 
-    @JsonProperty("user")
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private AppUser user;
+    @JsonProperty("user_id")
+    private Long userId;
 
-    @PrePersist
-    public void prePersist() {
-        this.creationDate = Objects.requireNonNullElseGet(
-                this.creationDate,
-                () -> ZonedDateTime.now(ZoneId.of(ASIA_TOKYO))
-        );
-
-        if (this.dueDate != null) {
-            this.dueDate = this.dueDate.withZoneSameInstant(ZoneId.of(ASIA_TOKYO))
-                    .withHour(0).withMinute(0).withSecond(0).withNano(0);
-        }
+    public Long getTaskId() {
+        return taskId;
     }
 
-    public Long getId() {
-        return id;
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getTaskCode() {
+        return taskCode;
+    }
+
+    public void setTaskCode(String taskCode) {
+        this.taskCode = taskCode;
     }
 
     public String getTitle() {
@@ -119,11 +92,11 @@ public class TaskItem {
         this.completeStatus = completeStatus;
     }
 
-    public AppUser getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(AppUser user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

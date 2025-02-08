@@ -5,6 +5,7 @@ import co.jht.model.domain.response.mapper.TaskItemMapper;
 import co.jht.model.domain.response.tasks.TaskItemCreateDTO;
 import co.jht.model.domain.response.tasks.TaskItemCreatedDTO;
 import co.jht.model.domain.response.tasks.TaskItemDTO;
+import co.jht.model.domain.response.tasks.TaskItemIdDTO;
 import co.jht.model.domain.response.tasks.TaskItemListedDTO;
 import co.jht.model.domain.response.tasks.TaskItemUpdateDTO;
 import co.jht.model.domain.response.tasks.TaskItemUserIdDTO;
@@ -61,18 +62,19 @@ public class TaskController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteTask(@PathVariable("taskId") Long taskId) {
-        taskService.deleteTask(taskId);
+    public ResponseEntity<Void> deleteTask(@RequestBody TaskItemIdDTO taskDTO) {
+        TaskItem task = taskItemMapper.toEntity(taskDTO);
+        taskService.deleteTask(task);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{taskId}/due_date")
+    @PutMapping("/update/due_date") //TODO:
     public ResponseEntity<TaskItemDTO> updateTaskDueDate(@PathVariable("taskId") Long taskId, @RequestBody TaskItemDTO taskDTO) {
         TaskItem updateTask = taskService.updateTaskDueDate(taskId, taskDTO.getDueDate());
         return ResponseEntity.ok(taskItemMapper.toDTO(updateTask));
     }
 
-    @PutMapping("/{taskId}/complete_status")
+    @PutMapping("/update/complete_status") //TODO:
     public ResponseEntity<TaskItemDTO> updateCompleteStatus(@PathVariable Long taskId, @RequestBody TaskItemDTO taskDTO) {
         TaskItem updateTask = taskService.updateTaskCompleteStatus(taskId, taskDTO.getCompleteStatus());
         return ResponseEntity.ok(taskItemMapper.toDTO(updateTask));

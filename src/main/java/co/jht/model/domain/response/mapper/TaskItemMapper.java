@@ -4,6 +4,7 @@ import co.jht.model.domain.persist.tasks.TaskItem;
 import co.jht.model.domain.response.tasks.TaskItemCreateDTO;
 import co.jht.model.domain.response.tasks.TaskItemCreatedDTO;
 import co.jht.model.domain.response.tasks.TaskItemDTO;
+import co.jht.model.domain.response.tasks.TaskItemIdDTO;
 import co.jht.model.domain.response.tasks.TaskItemListedDTO;
 import co.jht.model.domain.response.tasks.TaskItemUpdateDTO;
 import co.jht.service.UserService;
@@ -82,6 +83,12 @@ public class TaskItemMapper {
         task.setDescription(dto.getDescription());
         task.setDueDate(dto.getDueDate());
         task.setCompleteStatus(dto.getCompleteStatus());
+        return task;
+    }
+
+    public TaskItem toEntity(TaskItemIdDTO dto) {
+        TaskItem task = new TaskItem();
+        task.setId(dto.getTaskId());
         return task;
     }
 

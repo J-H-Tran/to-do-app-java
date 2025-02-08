@@ -30,7 +30,7 @@ public class AuthController {
     public ResponseEntity<Void> registerUser(@RequestBody AppUserRegisterDTO userRegisterDTO) {
         AppUser newUser = appUserMapper.toEntity(userRegisterDTO);
         userService.registerUser(newUser);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/authenticate")

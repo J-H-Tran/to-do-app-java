@@ -8,6 +8,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,10 @@ public class SecurityConfig {
     ) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .requiresChannel(ch -> ch
+                    .requestMatchers("/auth/authenticate/**")
+                    .requiresSecure()
+            )
             .securityMatchers(matchers -> matchers
                 .requestMatchers("/users/**", "/tasks/**")
             )
@@ -49,6 +54,10 @@ public class SecurityConfig {
 
                 .anyRequest()
                     .authenticated()
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionFixation().none()
             )
             .httpBasic(Customizer.withDefaults())
             .addFilterBefore(

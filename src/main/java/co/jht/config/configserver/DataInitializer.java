@@ -1,4 +1,4 @@
-package co.jht.config;
+package co.jht.config.configserver;
 
 import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
@@ -61,14 +61,11 @@ public class DataInitializer {
             AppUser regularUser = userRepository.findByUsername("regularUser");
             AppUser guestUser = userRepository.findByUsername("guestUser");
 
-            createTask("First Task", "Task description 1", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false, regularUser);
-            createTask("Second Task", "Task description 2", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false, regularUser);
-            createTask("Third Task", "Task description 3", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false,
-                    adminUser);
-            createTask("Fourth Task", "Task description 4", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false,
-                    adminUser);
-            createTask("Fifth Task", "Task description 5", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false,
-                    guestUser);
+            createTask("First Task", "Task description 1", DateTimeFormatterUtil.getCurrentTokyoTime(), regularUser);
+            createTask("Second Task", "Task description 2", DateTimeFormatterUtil.getCurrentTokyoTime(), regularUser);
+            createTask("Third Task", "Task description 3", DateTimeFormatterUtil.getCurrentTokyoTime(), adminUser);
+            createTask("Fourth Task", "Task description 4", DateTimeFormatterUtil.getCurrentTokyoTime(), adminUser);
+            createTask("Fifth Task", "Task description 5", DateTimeFormatterUtil.getCurrentTokyoTime(), guestUser);
         }
     }
 
@@ -99,8 +96,6 @@ public class DataInitializer {
             String title,
             String description,
             ZonedDateTime creationDate,
-            ZonedDateTime dueDate,
-            boolean completeStatus,
             AppUser user
     ) {
         TaskItem task = new TaskItem();
@@ -108,8 +103,8 @@ public class DataInitializer {
         task.setTitle(title);
         task.setDescription(description);
         task.setCreationDate(creationDate);
-        task.setDueDate(dueDate);
-        task.setCompleteStatus(completeStatus);
+        task.setDueDate(null);
+        task.setCompleteStatus(false);
         task.setUser(user);
 
         taskRepository.save(task);

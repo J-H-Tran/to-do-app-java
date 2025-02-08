@@ -1,4 +1,4 @@
-package co.jht.controller.advice;
+package co.jht.exception.advice;
 
 import co.jht.exception.EmailAlreadyExistsException;
 import co.jht.exception.ErrorResponse;

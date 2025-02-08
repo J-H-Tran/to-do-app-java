@@ -6,7 +6,15 @@ logging:
     root: INFO
 
 server:
-  port: 8080
+  port: 8443
+  ssl:
+    enabled: true
+    key-store-type: PKCS12
+    key-store: src/main/resources/keystore.p12
+    key-store-password: password
+    key-alias: todoapp
+  http:
+    port: 8080
   error:
     include-stacktrace: never
 

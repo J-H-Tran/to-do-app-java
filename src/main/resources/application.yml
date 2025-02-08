@@ -9,10 +9,11 @@ server:
   port: 8443
   ssl:
     enabled: true
-    key-store-type: PKCS12
-    key-store: src/main/resources/keystore.p12
+    key-store-type: JKS
+    key-store: src/main/resources/ode-https.jks
     key-store-password: password
-    key-alias: todoapp
+    key-password: password
+    key-alias: ode-https
   http:
     port: 8080
   error:

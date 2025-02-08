@@ -5,10 +5,12 @@ import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.repository.UserRepository;
 import co.jht.security.jwt.JwtTokenUtil;
 import co.jht.service.UserService;
+import co.jht.util.AuthUserUtil;
 import co.jht.util.DateTimeFormatterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,10 +18,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -50,8 +53,8 @@ public class UserServiceImpl implements UserService {
             logger.error("User not found with username: {}", username);
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        // Convert roles to GrantedAuthority
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+        // Set roles to GrantedAuthority
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
 
         // Initialize the user in the UserDetails
         return new User(user.getUsername(), user.getPassword(), Collections.singleton(grantedAuthority));
@@ -59,7 +62,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<AppUser> getAllUsers() {
-        return userRepository.findAll();
+        List<AppUser> users = userRepository.findAll();
+        return users.stream()
+                .sorted(Comparator.comparing(AppUser::getId))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -71,7 +77,6 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    @Transactional
     @Override
     public AppUser createUser(AppUser user) {
         if (user.getPassword() != null) {
@@ -84,7 +89,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    @Transactional
     @Override
     public AppUser updateUser(AppUser user, String authUsername) {
         return userRepository.save(updateUserDetails(user, authUsername));
@@ -110,21 +114,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String authenticateUser(AppUser user) {
-        AppUser userCreds = userRepository.findByUsername(user.getUsername());
+        AppUser savedUser = userRepository.findByUsername(user.getUsername());
 
-        if (userCreds != null && passwordEncoder.matches(user.getPassword(), userCreds.getPassword())) {
-            logger.info("User authenticated successfully: {}", userCreds.getUsername());
-            return jwtTokenUtil.generateToken(userCreds.getUsername());
-        }
-        logger.error("Authentication failed for user: {}", user.getUsername());
-        return null;
+        String token = getJwtToken(user, savedUser);
+        setCurrentUserContext(user.getUsername(), token);
+
+        return token;
     }
 
     private UserRole setCustomUserRole(String emailDomain) {
         if (emailDomain.endsWith("@tda.com")) {
-            return UserRole.ADMIN;
+            return UserRole.ROLE_ADMIN;
         }
-        return UserRole.USER;
+        return UserRole.ROLE_USER;
     }
 
     private AppUser updateUserDetails(AppUser user, String authUsername) {
@@ -138,5 +140,25 @@ public class UserServiceImpl implements UserService {
         savedUser.setAccountStatus(user.getAccountStatus());
 
         return savedUser;
+    }
+
+    private String getJwtToken(AppUser user, AppUser savedUser) {
+        String token = null;
+        if (savedUser != null && passwordEncoder.matches(user.getPassword(), savedUser.getPassword())) {
+            logger.info("User authenticated successfully: {}", savedUser.getUsername());
+            token = jwtTokenUtil.generateToken(savedUser.getUsername());
+        } else {
+            logger.error("Authentication failed for user: {}", user.getUsername());
+        }
+        return token;
+    }
+
+    private void setCurrentUserContext(String username, String token) {
+        if (token != null) {
+            UserDetails userDetails = loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken auth = AuthUserUtil.setAuthUserContext(userDetails);
+            logger.info("User logged in successfully: {}", username);
+            logger.info("User's listed authority: {}", auth.getAuthorities().toString());
+        }
     }
 }

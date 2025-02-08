@@ -22,7 +22,7 @@ import jakarta.persistence.Version;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-import static co.jht.enums.UserRole.USER;
+import static co.jht.enums.UserRole.ROLE_USER;
 import static co.jht.enums.UserStatus.ACTIVE;
 
 @Entity
@@ -69,7 +69,7 @@ public class AppUser {
     @JsonProperty("role")
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
-    private UserRole role = USER;
+    private UserRole role = ROLE_USER;
 
     @Version
     @Column(nullable = false)

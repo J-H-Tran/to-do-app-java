@@ -42,13 +42,15 @@ public class DataInitializer {
     @PostConstruct
     public void init() {
         if (userRepository.count() == 0) {
-            createUser(username, userPassword, "admin@tda.com", "FirstAdmin", "LastAdmin", UserRole.ADMIN);
-            createUser("regularUser", "regularPass", "regular@user.com", "FirstUser", "LastUser", UserRole.USER);
+            createUser(username, userPassword, "admin@tda.com", "FirstAdmin", "LastAdmin", UserRole.ROLE_ADMIN);
+            createUser("regularUser", "regularPass", "regular@user.com", "FirstUser", "LastUser", UserRole.ROLE_USER);
+            createUser("guestUser", "guestPass", "regular@guest.com", "FirstUser", "LastUser", UserRole.ROLE_GUEST);
         }
 
         if (taskRepository.count() == 0) {
             AppUser adminUser = userRepository.findByUsername(username);
             AppUser regularUser = userRepository.findByUsername("regularUser");
+            AppUser guestUser = userRepository.findByUsername("guestUser");
 
             createTask("First Task", "Task description 1", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false, regularUser);
             createTask("Second Task", "Task description 2", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false, regularUser);
@@ -56,6 +58,8 @@ public class DataInitializer {
                     adminUser);
             createTask("Fourth Task", "Task description 4", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false,
                     adminUser);
+            createTask("Fifth Task", "Task description 5", DateTimeFormatterUtil.getCurrentTokyoTime(), null, false,
+                    guestUser);
         }
     }
 

@@ -4,10 +4,10 @@ import co.jht.security.filter.JwtRequestFilter;
 import co.jht.security.jwt.JwtTokenUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,8 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -35,21 +33,21 @@ public class SecurityConfig {
             UserDetailsService userDetailsService
     ) throws Exception {
         http
-            .cors(withDefaults())
+            .cors(Customizer.withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
+            .securityMatchers(matchers -> matchers
+                .requestMatchers("/users/**", "/tasks/**")
+            )
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health").permitAll()
                 .requestMatchers("/users/update/**", "/users/delete/**", "/users/profile/**").hasAnyRole("ADMIN",
-                            "USER")
-                .requestMatchers("/users/**", "/users/user/**", "/users/create/**").hasRole("ADMIN")
+                        "USER")
                 .requestMatchers("/tasks/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .formLogin(withDefaults())
-            .httpBasic(withDefaults())
+            .formLogin(Customizer.withDefaults())
+            .httpBasic(Customizer.withDefaults())
             .addFilterBefore(
                 new JwtRequestFilter(jwtTokenUtil, userDetailsService),
                 UsernamePasswordAuthenticationFilter.class

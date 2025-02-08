@@ -1,8 +1,8 @@
 package co.jht.enums;
 
 public enum UserRole {
-    GUEST,
-    USER,
-    MODERATOR,
-    ADMIN;
+    ROLE_GUEST,
+    ROLE_USER,
+    ROLE_MODERATOR,
+    ROLE_ADMIN;
 }

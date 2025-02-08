@@ -30,8 +30,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskItem> getTasksByUserId(Long userId) {
-        return taskRepository.findByUserIdOrderById(userId).stream()
+    public List<TaskItem> getTasksByUserId(Long id) {
+        logger.info("Fetching tasks for userId: {}", id);
+        return taskRepository.findByUserIdOrderById(id).stream()
                 .peek(task -> {
                     task.setCreationDate(task.getCreationDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
 
@@ -68,7 +69,7 @@ public class TaskServiceImpl implements TaskService {
 
             return taskRepository.save(task);
         } else {
-            logger.error("Task not found with id: {}", taskId);
+            logger.error("Task to update Due Date not found with id: {}", taskId);
             throw new TaskNotFoundException("Task not found with id: " + taskId);
         }
     }
@@ -83,7 +84,7 @@ public class TaskServiceImpl implements TaskService {
 
             return taskRepository.save(task);
         } else {
-            logger.error("Task not found with id: {}", taskId);
+            logger.error("Task to update Complete Status not found with id: {}", taskId);
             throw new TaskNotFoundException("Task not found with id: " + taskId);
         }
     }

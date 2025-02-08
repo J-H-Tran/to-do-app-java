@@ -10,7 +10,7 @@ public interface UserService extends UserDetailsService {
     AppUser getUserById(Long userId);
     AppUser createUser(AppUser user);
     AppUser updateUser(AppUser user, String username);
-    void deleteUser(Long userId);
+    void deleteUser(String username);
     void registerUser(AppUser user);
     AppUser findByUsername(String username);
     String authenticateUser(AppUser user);

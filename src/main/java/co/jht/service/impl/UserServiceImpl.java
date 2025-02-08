@@ -1,6 +1,8 @@
 package co.jht.service.impl;
 
 import co.jht.enums.UserRole;
+import co.jht.exception.EmailAlreadyExistsException;
+import co.jht.exception.UserNotFoundException;
 import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.repository.UserRepository;
 import co.jht.security.jwt.JwtTokenUtil;
@@ -10,6 +12,7 @@ import co.jht.util.DateTimeFormatterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -73,7 +76,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
                     logger.error("User not found with id: {}", userId);
-                    return new UsernameNotFoundException("User not found with id: " + userId);
+                    return new UserNotFoundException("User not found with id: " + userId);
                 });
     }
 
@@ -95,16 +98,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+    public void deleteUser(String username) {
+        try {
+            AppUser user = userRepository.findByUsername(username);
+            userRepository.deleteById(user.getId());
+        } catch (Exception e) {
+            throw new UserNotFoundException("User not found with username: " + username);
+        }
     }
 
     @Override
     public void registerUser(AppUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(setCustomUserRole(user.getEmail()));
-
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyExistsException("Email already exists: " + user.getEmail());
+        }
+        logger.info("User registered successfully: {}, Welcome!", user.getUsername());
     }
 
     @Override
@@ -145,10 +157,10 @@ public class UserServiceImpl implements UserService {
     private String getJwtToken(AppUser user, AppUser savedUser) {
         String token = null;
         if (savedUser != null && passwordEncoder.matches(user.getPassword(), savedUser.getPassword())) {
-            logger.info("User authenticated successfully: {}", savedUser.getUsername());
+            logger.info("User logged in successfully: {}", savedUser.getUsername());
             token = jwtTokenUtil.generateToken(savedUser.getUsername());
         } else {
-            logger.error("Authentication failed for user: {}", user.getUsername());
+            logger.error("Authentication failed for user: {} Invalid username or password!", user.getUsername());
         }
         return token;
     }
@@ -157,7 +169,6 @@ public class UserServiceImpl implements UserService {
         if (token != null) {
             UserDetails userDetails = loadUserByUsername(username);
             UsernamePasswordAuthenticationToken auth = AuthUserUtil.setAuthUserContext(userDetails);
-            logger.info("User logged in successfully: {}", username);
             logger.info("User's listed authority: {}", auth.getAuthorities().toString());
         }
     }

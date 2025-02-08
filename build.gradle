@@ -7,6 +7,12 @@ plugins {
 group = 'co.jht'
 version = '1.0-SNAPSHOT'
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -23,25 +29,34 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
     // SpringDoc OpenAPI
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
     implementation "org.springdoc:springdoc-openapi-starter-common:${springDocVersion}"
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
     // JUnit
-    testImplementation 'org.junit:junit-bom:5.11.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    // Mockito
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+
 
     // PostgreSQL
     implementation 'org.postgresql:postgresql:42.7.2'
+
+    // Hikari
+    implementation 'com.zaxxer:HikariCP:6.2.1'
 
     // JWT
     implementation "io.jsonwebtoken:jjwt-api:${jwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jwtVersion}"
+
 }
 
 test {

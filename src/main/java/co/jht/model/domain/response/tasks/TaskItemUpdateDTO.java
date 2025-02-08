@@ -1,13 +1,16 @@
-package co.jht.model.domain.response.dto.tasks;
+package co.jht.model.domain.response.tasks;
 
+import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.ZonedDateTime;
 
-public class TaskItemDTO {
-    private Long taskId;
+public class TaskItemUpdateDTO {
+    @JsonProperty("task_code")
+    private String taskCode;
 
     @JsonProperty("title")
     private String title;
@@ -15,26 +18,20 @@ public class TaskItemDTO {
     @JsonProperty("description")
     private String description;
 
-    @JsonProperty("creation_date")
-    @JsonSerialize(using = ZonedDateTimeSerializer.class)
-    private ZonedDateTime creationDate;
-
     @JsonProperty("due_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime dueDate;
 
     @JsonProperty("complete_status")
     private boolean completeStatus;
 
-    @JsonProperty("user_id")
-    private Long userId;
-
-    public Long getTaskId() {
-        return taskId;
+    public String getTaskCode() {
+        return taskCode;
     }
 
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
+    public void setTaskCode(String taskCode) {
+        this.taskCode = taskCode;
     }
 
     public String getTitle() {
@@ -53,14 +50,6 @@ public class TaskItemDTO {
         this.description = description;
     }
 
-    public ZonedDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(ZonedDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public ZonedDateTime getDueDate() {
         return dueDate;
     }
@@ -75,13 +64,5 @@ public class TaskItemDTO {
 
     public void setCompleteStatus(boolean completeStatus) {
         this.completeStatus = completeStatus;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 }

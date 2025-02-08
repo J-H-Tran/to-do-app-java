@@ -15,6 +15,6 @@ public class DateTimeFormatterUtil {
     }
 
     public static ZonedDateTime getCurrentTokyoTime() {
-        return ZonedDateTime.parse(ZonedDateTime.now(ZoneId.of(ASIA_TOKYO)).format(DateTimeFormatterUtil.getFormatter()));
+        return ZonedDateTime.parse(ZonedDateTime.now(ZoneId.of(ASIA_TOKYO)).format(FORMATTER));
     }
 }

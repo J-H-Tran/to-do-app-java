@@ -1,42 +1,50 @@
 package co.jht.service.impl;
 
 import co.jht.enums.UserRole;
-import co.jht.model.domain.persist.entity.appuser.AppUser;
-import co.jht.model.domain.response.dto.mapper.AppUserMapper;
+import co.jht.exception.EmailAlreadyExistsException;
+import co.jht.exception.UserNotFoundException;
+import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.repository.UserRepository;
 import co.jht.security.jwt.JwtTokenUtil;
 import co.jht.service.UserService;
+import co.jht.util.AuthUserUtil;
 import co.jht.util.DateTimeFormatterUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
-    private final AppUserMapper appUserMapper;
 
     @Autowired
     public UserServiceImpl(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            JwtTokenUtil jwtTokenUtil,
-            AppUserMapper appUserMapper
+            JwtTokenUtil jwtTokenUtil
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
-        this.appUserMapper = appUserMapper;
     }
 
     // from UserDetailService
@@ -45,55 +53,70 @@ public class UserServiceImpl implements UserService {
         AppUser user = userRepository.findByUsername(username);
 
         if (user == null) {
+            logger.error("User not found with username: {}", username);
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        // Initialize the user in the UserDetail context
-        return new User(user.getUsername(), user.getPassword(), Collections.emptyList());
+        // Set roles to GrantedAuthority
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
+
+        // Initialize the user in the UserDetails
+        return new User(user.getUsername(), user.getPassword(), Collections.singleton(grantedAuthority));
     }
 
     @Override
     public List<AppUser> getAllUsers() {
-        return userRepository.findAll();
+        List<AppUser> users = userRepository.findAll();
+        return users.stream()
+                .sorted(Comparator.comparing(AppUser::getId))
+                .collect(Collectors.toList());
     }
 
     @Override
     public AppUser getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> {
+                    logger.error("User not found with id: {}", userId);
+                    return new UserNotFoundException("User not found with id: " + userId);
+                });
     }
 
-    @Transactional
     @Override
     public AppUser createUser(AppUser user) {
         if (user.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         } else {
+            logger.error("Password cannot be null for user: {}", user.getUsername());
             throw new IllegalArgumentException("Password cannot be null!");
         }
         user.setRegistrationDate(DateTimeFormatterUtil.getCurrentTokyoTime());
         return userRepository.save(user);
     }
 
-    @Transactional
     @Override
-    public AppUser updateUser(AppUser user) {
-        return userRepository.save(updateUserDetails(user));
+    public AppUser updateUser(AppUser user, String authUsername) {
+        return userRepository.save(updateUserDetails(user, authUsername));
     }
 
     @Override
-    public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+    public void deleteUser(String username) {
+        try {
+            AppUser user = userRepository.findByUsername(username);
+            userRepository.deleteById(user.getId());
+        } catch (Exception e) {
+            throw new UserNotFoundException("User not found with username: " + username);
+        }
     }
 
     @Override
-    public void registerUser(String username, String password, String email) {
-        AppUser user = new AppUser();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setEmail(email);
-        user.setRole(setCustomUserRole(email));
-
-        userRepository.save(user);
+    public void registerUser(AppUser user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(setCustomUserRole(user.getEmail()));
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyExistsException("Email already exists: " + user.getEmail());
+        }
+        logger.info("User registered successfully: {}, Welcome!", user.getUsername());
     }
 
     @Override
@@ -102,35 +125,51 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String authenticateUser(String username, String password) {
-        AppUser user = userRepository.findByUsername(username);
+    public String authenticateUser(AppUser user) {
+        AppUser savedUser = userRepository.findByUsername(user.getUsername());
 
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return jwtTokenUtil.generateToken(username);
-        }
-        return null;
+        String token = getJwtToken(user, savedUser);
+        setCurrentUserContext(user.getUsername(), token);
+
+        return token;
     }
 
     private UserRole setCustomUserRole(String emailDomain) {
         if (emailDomain.endsWith("@tda.com")) {
-            return UserRole.ADMIN;
+            return UserRole.ROLE_ADMIN;
         }
-        return UserRole.USER;
+        return UserRole.ROLE_USER;
     }
 
-    private AppUser updateUserDetails(AppUser user) {
-        AppUser existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        existingUser.setUsername(user.getUsername());
-        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        existingUser.setEmail(user.getEmail());
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setProfilePictureUrl(user.getProfilePictureUrl());
-        existingUser.setRegistrationDate(user.getRegistrationDate());
-        existingUser.setAccountStatus(user.getAccountStatus());
-        existingUser.setRole(user.getRole());
+    private AppUser updateUserDetails(AppUser user, String authUsername) {
+        AppUser savedUser = userRepository.findByUsername(authUsername);
+        savedUser.setUsername(user.getUsername());
+        savedUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        savedUser.setEmail(user.getEmail());
+        savedUser.setFirstName(user.getFirstName());
+        savedUser.setLastName(user.getLastName());
+        savedUser.setProfilePictureUrl(user.getProfilePictureUrl());
+        savedUser.setAccountStatus(user.getAccountStatus());
 
-        return existingUser;
+        return savedUser;
+    }
+
+    private String getJwtToken(AppUser user, AppUser savedUser) {
+        String token = null;
+        if (savedUser != null && passwordEncoder.matches(user.getPassword(), savedUser.getPassword())) {
+            logger.info("User logged in successfully: {}", savedUser.getUsername());
+            token = jwtTokenUtil.generateToken(savedUser.getUsername());
+        } else {
+            logger.error("Authentication failed for user: {} Invalid username or password!", user.getUsername());
+        }
+        return token;
+    }
+
+    private void setCurrentUserContext(String username, String token) {
+        if (token != null) {
+            UserDetails userDetails = loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken auth = AuthUserUtil.setAuthUserContext(userDetails);
+            logger.info("User's listed authority: {}", auth.getAuthorities().toString());
+        }
     }
 }

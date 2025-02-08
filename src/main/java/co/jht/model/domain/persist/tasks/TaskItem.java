@@ -1,5 +1,6 @@
 package co.jht.model.domain.persist.tasks;
 
+import co.jht.generator.TaskCodeGenerator;
 import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
@@ -29,6 +30,10 @@ public class TaskItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @JsonProperty("task_code")
+    @Column(nullable = false)
+    private String taskCode;
 
     @JsonProperty("title")
     @Column(nullable = false)
@@ -61,6 +66,11 @@ public class TaskItem {
 
     @PrePersist
     public void prePersist() {
+        // has format of "JHT-10000" and counts up from there "JHT-10001" "JHT-10002" and so on.
+        if (this.taskCode == null) {
+            this.taskCode = TaskCodeGenerator.generateTaskCode();
+        }
+
         this.creationDate = Objects.requireNonNullElseGet(
                 this.creationDate,
                 DateTimeFormatterUtil::getCurrentTokyoTime

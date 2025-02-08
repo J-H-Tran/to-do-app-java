@@ -3,12 +3,12 @@ package co.jht.controller;
 import co.jht.model.domain.persist.tasks.TaskItem;
 import co.jht.model.domain.response.mapper.TaskItemMapper;
 import co.jht.model.domain.response.tasks.TaskItemCreateDTO;
+import co.jht.model.domain.response.tasks.TaskItemCreatedDTO;
 import co.jht.model.domain.response.tasks.TaskItemDTO;
+import co.jht.model.domain.response.tasks.TaskItemListedDTO;
 import co.jht.model.domain.response.tasks.TaskItemUserIdDTO;
 import co.jht.service.TaskService;
 import co.jht.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,8 +26,6 @@ import java.util.List;
 @RequestMapping("/tasks")
 public class TaskController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskController.class);
-
     private final TaskService taskService;
     private final UserService userService;
     private final TaskItemMapper taskItemMapper;
@@ -44,20 +42,18 @@ public class TaskController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<TaskItem>> getTasksByUserId(@RequestBody TaskItemUserIdDTO taskItemUserIdDTO) {
+    public ResponseEntity<List<TaskItemListedDTO>> getTasksByUserId(@RequestBody TaskItemUserIdDTO taskItemUserIdDTO) {
         Long id = taskItemUserIdDTO.getUserId();
-
         List<TaskItem> tasks = taskService.getTasksByUserId(id);
-
-        logger.info("Retrieved tasks: {}", tasks);
-        return ResponseEntity.ok(tasks);
+        List<TaskItemListedDTO> taskDTOs = taskItemMapper.toDTO(tasks);
+        return ResponseEntity.ok(taskDTOs);
     }
 
     @PostMapping
-    public ResponseEntity<TaskItemDTO> createTask(@RequestBody TaskItemCreateDTO taskDTO) {
+    public ResponseEntity<TaskItemCreatedDTO> createTask(@RequestBody TaskItemCreateDTO taskDTO) {
         TaskItem task = taskItemMapper.toEntity(taskDTO);
         TaskItem createdTask = taskService.createTask(task);
-        return ResponseEntity.ok(taskItemMapper.toDTO(createdTask));
+        return ResponseEntity.ok(taskItemMapper.toCreatedDTO(createdTask));
     }
 
     @PutMapping("/{taskId}")

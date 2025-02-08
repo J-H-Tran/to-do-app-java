@@ -2,8 +2,10 @@ package co.jht.model.domain.response.appuser;
 
 import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
+import co.jht.serializer.ZonedDateTimeDeserializer;
 import co.jht.serializer.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.ZonedDateTime;
@@ -29,6 +31,7 @@ public class AppUserDTO implements AppUserDTOBase {
 
     @JsonProperty("registration_date")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime registrationDate;
 
     @JsonProperty("account_status")

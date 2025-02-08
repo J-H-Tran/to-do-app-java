@@ -8,9 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.ZonedDateTime;
 
-public class TaskItemDTO {
-    private Long taskId;
-
+public class TaskItemListedDTO {
     @JsonProperty("task_code")
     private String taskCode;
 
@@ -33,15 +31,15 @@ public class TaskItemDTO {
     @JsonProperty("complete_status")
     private boolean completeStatus;
 
-    @JsonProperty("user_id")
-    private Long userId;
+    @JsonProperty("user_email")
+    private String userEmail;
 
-    public Long getTaskId() {
-        return taskId;
+    public String getTaskCode() {
+        return taskCode;
     }
 
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
+    public void setTaskCode(String taskCode) {
+        this.taskCode = taskCode;
     }
 
     public String getTitle() {
@@ -84,11 +82,11 @@ public class TaskItemDTO {
         this.completeStatus = completeStatus;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getUserEmail() {
+        return userEmail;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

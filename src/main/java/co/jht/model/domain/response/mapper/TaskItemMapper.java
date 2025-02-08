@@ -2,10 +2,15 @@ package co.jht.model.domain.response.mapper;
 
 import co.jht.model.domain.persist.tasks.TaskItem;
 import co.jht.model.domain.response.tasks.TaskItemCreateDTO;
+import co.jht.model.domain.response.tasks.TaskItemCreatedDTO;
 import co.jht.model.domain.response.tasks.TaskItemDTO;
+import co.jht.model.domain.response.tasks.TaskItemListedDTO;
 import co.jht.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class TaskItemMapper {
@@ -26,7 +31,25 @@ public class TaskItemMapper {
         dto.setDueDate(task.getDueDate());
         dto.setCompleteStatus(task.getCompleteStatus());
         dto.setUserId(task.getId());
+        return dto;
+    }
 
+    public List<TaskItemListedDTO> toDTO(List<TaskItem> tasks) {
+        // implement
+        return tasks.stream()
+                .map(this::toListedDTO)
+                .collect(Collectors.toList());
+    }
+
+    public TaskItemCreatedDTO toCreatedDTO(TaskItem task) {
+        TaskItemCreatedDTO dto = new TaskItemCreatedDTO();
+        dto.setTaskCode(task.getTaskCode());
+        dto.setTitle(task.getTitle());
+        dto.setDescription(task.getDescription());
+        dto.setCreationDate(task.getCreationDate());
+        dto.setDueDate(task.getDueDate());
+        dto.setCompleteStatus(task.getCompleteStatus());
+        dto.setUserEmail(task.getUser().getEmail());
         return dto;
     }
 
@@ -39,7 +62,6 @@ public class TaskItemMapper {
         task.setDueDate(dto.getDueDate());
         task.setCompleteStatus(dto.getCompleteStatus());
         task.setUser(userService.getUserById(dto.getUserId()));
-
         return task;
     }
 
@@ -48,8 +70,18 @@ public class TaskItemMapper {
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
         task.setDueDate(dto.getDueDate());
-        task.setCompleteStatus(dto.getCompleteStatus());
-
         return task;
+    }
+
+    private TaskItemListedDTO toListedDTO(TaskItem task) {
+        TaskItemListedDTO dto = new TaskItemListedDTO();
+        dto.setTaskCode(task.getTaskCode());
+        dto.setTitle(task.getTitle());
+        dto.setDescription(task.getDescription());
+        dto.setCreationDate(task.getCreationDate());
+        dto.setDueDate(task.getDueDate());
+        dto.setCompleteStatus(task.getCompleteStatus());
+        dto.setUserEmail(task.getUser().getEmail());
+        return dto;
     }
 }

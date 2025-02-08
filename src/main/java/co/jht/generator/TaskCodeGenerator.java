@@ -1,12 +1,23 @@
 package co.jht.generator;
 
-import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 
+import static co.jht.constants.ApplicationConstants.TASK_CODE_PREFIX;
+
+@Service
 public class TaskCodeGenerator {
-    private static final String PREFIX = "JHT-";
-    private static final AtomicLong COUNTER = new AtomicLong(10000);
 
-    public static String generateTaskCode() {
-        return PREFIX + COUNTER.getAndIncrement();
+    private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public TaskCodeGenerator(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public String generateTaskCode() {
+        Long nextVal = jdbcTemplate.queryForObject("SELECT nextval('task_code_seq')", Long.class);
+        return String.format("%s%05d", TASK_CODE_PREFIX, nextVal);
     }
 }

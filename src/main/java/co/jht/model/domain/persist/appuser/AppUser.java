@@ -2,12 +2,7 @@ package co.jht.model.domain.persist.appuser;
 
 import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
-import co.jht.serializer.ZonedDateTimeDeserializer;
-import co.jht.serializer.ZonedDateTimeSerializer;
 import co.jht.util.DateTimeFormatterUtil;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -32,41 +27,30 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty("username")
     @Column(nullable = false, unique = true)
     private String username;
 
-    @JsonProperty("password")
     @Column(nullable = false)
     private String password;
 
-    @JsonProperty("email")
     @Column(nullable = false, unique = true)
     private String email;
 
-    @JsonProperty("first_name")
     @Column(nullable = false)
     private String firstName;
 
-    @JsonProperty("last_name")
     @Column(nullable = false)
     private String lastName;
 
-    @JsonProperty("profile_picture_url")
     @Column(nullable = false)
     private String profilePictureUrl = "http://default.jpg";
 
-    @JsonProperty("registration_date")
-    @JsonSerialize(using = ZonedDateTimeSerializer.class)
-    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime registrationDate;
 
-    @JsonProperty("account_status")
     @Column(nullable = false)
     private UserStatus accountStatus = ACTIVE;
 
-    @JsonProperty("role")
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private UserRole role = ROLE_USER;

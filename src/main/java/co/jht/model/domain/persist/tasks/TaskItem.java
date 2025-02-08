@@ -1,13 +1,7 @@
 package co.jht.model.domain.persist.tasks;
 
-import co.jht.generator.TaskCodeGenerator;
 import co.jht.model.domain.persist.appuser.AppUser;
-import co.jht.serializer.ZonedDateTimeDeserializer;
-import co.jht.serializer.ZonedDateTimeSerializer;
 import co.jht.util.DateTimeFormatterUtil;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,46 +25,30 @@ public class TaskItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty("task_code")
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String taskCode;
 
-    @JsonProperty("title")
     @Column(nullable = false)
     private String title;
 
-    @JsonProperty("description")
     @Column
     private String description;
 
-    @JsonProperty("creation_date")
-    @JsonSerialize(using = ZonedDateTimeSerializer.class)
-    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime creationDate;
 
-    @JsonProperty("due_date")
-    @JsonSerialize(using = ZonedDateTimeSerializer.class)
-    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime dueDate;
 
-    @JsonProperty("complete_status")
     @Column(nullable = false)
     private boolean completeStatus = false;
 
-    @JsonProperty("user")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
 
     @PrePersist
     public void prePersist() {
-        // has format of "JHT-10000" and counts up from there "JHT-10001" "JHT-10002" and so on.
-        if (this.taskCode == null) {
-            this.taskCode = TaskCodeGenerator.generateTaskCode();
-        }
-
         this.creationDate = Objects.requireNonNullElseGet(
                 this.creationDate,
                 DateTimeFormatterUtil::getCurrentTokyoTime
@@ -88,6 +66,14 @@ public class TaskItem {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTaskCode() {
+        return taskCode;
+    }
+
+    public void setTaskCode(String taskCode) {
+        this.taskCode = taskCode;
     }
 
     public String getTitle() {

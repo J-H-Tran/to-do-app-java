@@ -2,6 +2,7 @@ package co.jht.config;
 
 import co.jht.enums.UserRole;
 import co.jht.enums.UserStatus;
+import co.jht.generator.TaskCodeGenerator;
 import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.model.domain.persist.tasks.TaskItem;
 import co.jht.repository.TaskRepository;
@@ -10,6 +11,7 @@ import co.jht.util.DateTimeFormatterUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,8 @@ public class DataInitializer {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TaskCodeGenerator taskCodeGenerator;
+    private final JdbcTemplate jdbcTemplate;
 
     @Value("${app.first-user.name}")
     private String username;
@@ -32,15 +36,20 @@ public class DataInitializer {
     public DataInitializer(
             UserRepository userRepository,
             TaskRepository taskRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            TaskCodeGenerator taskCodeGenerator,
+            JdbcTemplate jdbcTemplate
     ) {
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.passwordEncoder = passwordEncoder;
+        this.taskCodeGenerator = taskCodeGenerator;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @PostConstruct
     public void init() {
+        jdbcTemplate.execute("CREATE SEQUENCE IF NOT EXISTS task_code_seq START 1");
         if (userRepository.count() == 0) {
             createUser(username, userPassword, "admin@tda.com", "FirstAdmin", "LastAdmin", UserRole.ROLE_ADMIN);
             createUser("regularUser", "regularPass", "regular@user.com", "FirstUser", "LastUser", UserRole.ROLE_USER);
@@ -95,6 +104,7 @@ public class DataInitializer {
             AppUser user
     ) {
         TaskItem task = new TaskItem();
+        task.setTaskCode(taskCodeGenerator.generateTaskCode());
         task.setTitle(title);
         task.setDescription(description);
         task.setCreationDate(creationDate);

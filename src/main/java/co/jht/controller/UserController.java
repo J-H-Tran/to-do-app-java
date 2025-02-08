@@ -9,6 +9,7 @@ import co.jht.model.domain.response.mapper.AppUserMapper;
 import co.jht.service.UserService;
 import co.jht.util.AuthUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +44,9 @@ public class UserController {
     @GetMapping("/user")
     public ResponseEntity<AppUserDTO> getUserById(@RequestBody AppUserIdDTO appUserIdDTO) {
         AppUser user = userService.getUserById(appUserIdDTO.getId());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         return ResponseEntity.ok(appUserMapper.toDTO(user));
     }
 
@@ -62,14 +66,17 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteUser(@RequestBody AppUserIdDTO appUserIdDTO) {
-        userService.deleteUser(appUserIdDTO.getId());
+    public ResponseEntity<Void> deleteUser(@RequestBody AppUsernameDTO appUsernameDTO) {
+        userService.deleteUser(appUsernameDTO.getUsername());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/profile")
     public ResponseEntity<AppUserDTO> getUserProfile(@RequestBody AppUsernameDTO appUsernameDTO) {
         AppUser user = userService.findByUsername(appUsernameDTO.getUsername());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         return ResponseEntity.ok(appUserMapper.toDTO(user));
     }
 }

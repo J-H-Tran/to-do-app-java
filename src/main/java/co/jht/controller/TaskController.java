@@ -46,7 +46,7 @@ public class TaskController {
     @GetMapping("/user")
     public ResponseEntity<List<TaskItem>> getTasksByUserId(@RequestBody TaskItemUserIdDTO taskItemUserIdDTO) {
         Long id = taskItemUserIdDTO.getUserId();
-        logger.info("Fetching tasks for userId: {}", id);
+
         List<TaskItem> tasks = taskService.getTasksByUserId(id);
 
         logger.info("Retrieved tasks: {}", tasks);

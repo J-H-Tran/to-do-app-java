@@ -35,8 +35,8 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/authenticate")
-    public ResponseEntity<String> authenticateUser(@RequestBody AppUserLoginDTO userLoginDTO) {
+    @PostMapping("/login")
+    public ResponseEntity<RegisterResponseDTO> authenticateUser(@RequestBody AppUserLoginDTO userLoginDTO) {
         AppUser user = appUserMapper.toEntity(userLoginDTO);
         String token = userService.authenticateUser(user);
 
@@ -45,6 +45,17 @@ public class AuthController {
                     .header("Authorization", "Bearer " + token)
                     .build();
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password!");
+        RegisterResponseDTO response = new RegisterResponseDTO("Invalid username or password!");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logoutUser() {
+        try {
+            userService.logoutUser();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

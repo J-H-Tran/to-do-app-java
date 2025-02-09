@@ -16,6 +16,7 @@ server:
     key-alias: ode-https
   http:
     port: 8080
+
   error:
     include-stacktrace: never
 

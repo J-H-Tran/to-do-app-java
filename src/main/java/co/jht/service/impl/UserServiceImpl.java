@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // from UserDetailService
+    // from UserDetailsService
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser user = userRepository.findByUsername(username);
@@ -105,7 +105,9 @@ public class UserServiceImpl implements UserService {
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
 
         // Initialize the user in the UserDetails
-        return new User(user.getUsername(), user.getPassword(), Collections.singleton(grantedAuthority));
+        UserDetails userDetails = new User(user.getUsername(), user.getPassword(), Collections.singleton(grantedAuthority));
+        logger.info("UserDetails loaded to UserDetailsService: {}", userDetails);
+        return userDetails;
     }
 
     @Override
@@ -130,7 +132,7 @@ public class UserServiceImpl implements UserService {
         AppUser savedUser = userRepository.findByUsername(user.getUsername());
 
         String token = getJwtToken(user, savedUser);
-        setCurrentUserContext(user.getUsername(), token);
+//        setCurrentUserContext(user.getUsername(), token);
 
         return token;
     }
@@ -176,8 +178,10 @@ public class UserServiceImpl implements UserService {
 
     private String getJwtToken(AppUser user, AppUser savedUser) {
         String token = null;
+        // Password verification against encoded password stored in database
         if (savedUser != null && passwordEncoder.matches(user.getPassword(), savedUser.getPassword())) {
-            logger.info("User logged in successfully: {}", savedUser.getUsername());
+            logger.info("Password verified for user: {}", savedUser.getUsername());
+            // Generate JTW for "authenticated" user
             token = jwtTokenUtil.generateToken(savedUser.getUsername());
         } else {
             logger.error("Authentication failed for user: {} Invalid username or password!", user.getUsername());

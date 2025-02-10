@@ -7,14 +7,21 @@ import co.jht.model.domain.response.appuser.RegisterUserDto;
 import co.jht.model.domain.response.appuser.VerifyUserDto;
 import co.jht.repository.UserRepository;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
@@ -24,14 +31,16 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final JwtService jwtService;
 
-    private Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailService emailService) {
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailService emailService, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.emailService = emailService;
+        this.jwtService = jwtService;
     }
 
     public AppUser signup(RegisterUserDto dto) {
@@ -64,7 +73,7 @@ public class AuthenticationService {
         logger.info("Attempting to authenticate the user by AuthenticationManager");
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    user.getUsername(),
+                    user.getUsername(), // User username as principal
                     dto.getPassword() // Raw password handled by authentication manager provided with decoder
                 )
         );
@@ -108,6 +117,27 @@ public class AuthenticationService {
             userRepository.save(user);
         } else {
             throw new UserNotFoundException("User not found");
+        }
+    }
+
+    public void revokeAuthentication() {
+        SecurityContextHolder.clearContext();
+        logger.info("Current SecurityContext cleared");
+
+        // change the JWT expiration Date.now()
+        String token = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
+                .getRequest().getHeader("Authorization").substring(7);
+        logger.info("JWT to invalidate: {}", token);
+        jwtService.invalidateToken(token);
+
+        // Clear cookies, if any
+        logger.info("Clearing cookies, if any");
+        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = attr.getRequest();
+        HttpServletResponse response = attr.getResponse();
+        if (response != null) {
+            SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+            logoutHandler.logout(request, response, null);
         }
     }
 

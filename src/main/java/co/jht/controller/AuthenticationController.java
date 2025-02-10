@@ -70,4 +70,10 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        authenticationService.revokeAuthentication();
+        return ResponseEntity.ok("Logout successful");
+    }
 }

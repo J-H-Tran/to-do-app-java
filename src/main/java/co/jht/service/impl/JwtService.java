@@ -44,6 +44,18 @@ public class JwtService {
         return (userDetails.getUsername().equals(tokenUsername) && !isTokenExpired(token));
     }
 
+    public void invalidateToken(String token) {
+        Claims claims = extractAllClaims(token);
+        claims.getExpiration();
+
+        String invalidateToken = Jwts.builder()
+                .claims(claims)
+                .expiration( new Date())
+                .signWith(getSignInKey())
+                .compact();
+        // Option to store to blacklist, if needed
+    }
+
     public <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);

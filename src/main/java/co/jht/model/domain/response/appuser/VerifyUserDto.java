@@ -8,4 +8,12 @@ import lombok.Setter;
 public class VerifyUserDto {
     private String email;
     private String verificationCode;
+
+    @Override
+    public String toString() {
+        return "VerifyUserDto{" +
+                "email='" + email + '\'' +
+                ", verificationCode='" + verificationCode + '\'' +
+                '}';
+    }
 }

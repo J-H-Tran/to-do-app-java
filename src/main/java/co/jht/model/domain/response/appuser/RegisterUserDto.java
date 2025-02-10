@@ -13,4 +13,13 @@ public class RegisterUserDto {
     private String username;
     @JsonProperty("password")
     private String password;
+
+    @Override
+    public String toString() {
+        return "RegisterUserDto{" +
+                "email='" + email + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
 }

@@ -1,6 +1,6 @@
 package co.jht.service;
 
-import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.entity.appuser.AppUser;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;

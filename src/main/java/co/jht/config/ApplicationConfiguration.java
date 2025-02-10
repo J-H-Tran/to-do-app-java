@@ -11,6 +11,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+/**
+ * Credit to: https://github.com/Erik-Cupsa/Spring-Security-Tutorial
+ * for the implementation details of logging in with JWT, authentication,
+ * Java Send Email verification code, and resend verification code.
+ *
+ * */
 @Configuration
 public class ApplicationConfiguration {
 

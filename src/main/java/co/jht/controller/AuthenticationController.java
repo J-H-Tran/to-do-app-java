@@ -1,6 +1,6 @@
 package co.jht.controller;
 
-import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.entity.appuser.AppUser;
 import co.jht.model.domain.response.NormalLogin;
 import co.jht.model.domain.response.appuser.LoginUserDto;
 import co.jht.model.domain.response.appuser.RegisterUserDto;

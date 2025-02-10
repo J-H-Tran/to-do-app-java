@@ -1,8 +1,8 @@
 package co.jht.config;
 
 import co.jht.generator.TaskCodeGenerator;
-import co.jht.model.domain.persist.appuser.AppUser;
-import co.jht.model.domain.persist.tasks.TaskItem;
+import co.jht.model.domain.entity.appuser.AppUser;
+import co.jht.model.domain.entity.tasks.TaskItem;
 import co.jht.repository.TaskRepository;
 import co.jht.repository.UserRepository;
 import co.jht.util.DateTimeFormatterUtil;

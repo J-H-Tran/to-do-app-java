@@ -1,6 +1,6 @@
 package co.jht.service.impl;
 
-import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.entity.appuser.AppUser;
 import co.jht.repository.UserRepository;
 import org.springframework.stereotype.Service;
 

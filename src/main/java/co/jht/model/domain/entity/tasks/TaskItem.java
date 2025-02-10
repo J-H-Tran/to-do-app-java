@@ -1,6 +1,6 @@
-package co.jht.model.domain.persist.tasks;
+package co.jht.model.domain.entity.tasks;
 
-import co.jht.model.domain.persist.appuser.AppUser;
+import co.jht.model.domain.entity.appuser.AppUser;
 import co.jht.util.DateTimeFormatterUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package co.jht.model.domain.persist.appuser;
+package co.jht.model.domain.entity.appuser;
 
 import co.jht.enums.UserRole;
 import jakarta.persistence.Column;

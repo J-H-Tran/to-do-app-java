@@ -16,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,22 +46,6 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
-    }
-
-    // from UserDetailService
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser user = userRepository.findByUsername(username);
-
-        if (user == null) {
-            logger.error("User not found with username: {}", username);
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-        // Set roles to GrantedAuthority
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
-
-        // Initialize the user in the UserDetails
-        return new User(user.getUsername(), user.getPassword(), Collections.singleton(grantedAuthority));
     }
 
     @Override
@@ -107,6 +92,22 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    // from UserDetailService
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        AppUser user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            logger.error("User not found with username: {}", username);
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+        // Set roles to GrantedAuthority
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
+
+        // Initialize the user in the UserDetails
+        return new User(user.getUsername(), user.getPassword(), Collections.singleton(grantedAuthority));
+    }
+
     @Override
     public void registerUser(AppUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -133,6 +134,25 @@ public class UserServiceImpl implements UserService {
 
         return token;
     }
+
+    @Override
+    public void logoutUser() {
+        try {
+            String username = AuthUserUtil.getAuthUsername();
+            if (username != null) {
+                logger.info("Logging out user: {}", username);
+                jwtTokenUtil.invalidateToken(username);
+            } else {
+                logger.warn("No user found in the current session to log out.");
+            }
+            SecurityContextHolder.clearContext();
+            logger.info("User logged out: {}", username);
+        } catch (Exception e) {
+            logger.error("Error occurred during logout: ", e);
+            throw e;
+        }
+    }
+
 
     private UserRole setCustomUserRole(String emailDomain) {
         if (emailDomain.endsWith("@tda.com")) {

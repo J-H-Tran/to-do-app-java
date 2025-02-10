@@ -54,7 +54,7 @@ public class UserController {
     public ResponseEntity<AppUserDTO> createUser(@RequestBody AppUserDTO userDTO) {
         AppUser user = appUserMapper.toEntity(userDTO);
         AppUser createdUser = userService.createUser(user);
-        return ResponseEntity.ok(appUserMapper.toDTO(createdUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(appUserMapper.toDTO(createdUser));
     }
 
     @PutMapping("/update")

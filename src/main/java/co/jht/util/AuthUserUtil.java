@@ -1,15 +1,19 @@
 package co.jht.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Collection;
 
 public class AuthUserUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthUserUtil.class);
 
     public static UsernamePasswordAuthenticationToken setAuthUserContext(UserDetails userDetails) {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -22,18 +26,18 @@ public class AuthUserUtil {
     }
 
     public static String getAuthUsername() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = null;
+        SecurityContext context = SecurityContextHolder.getContext();
+        logger.info("Context retrieved from SecurityContextHolder: {}", context.toString());
+
+        Authentication auth = context.getAuthentication();
+        logger.info("Authentication retrieved from SecurityContextHolder: {}", auth);
 
         if (auth != null && auth.getPrincipal() instanceof UserDetails) {
-            currentUsername = ((UserDetails) auth.getPrincipal()).getUsername();
+            String authUsername = ((UserDetails) auth.getPrincipal()).getUsername();
+            logger.info("Context username: {}", authUsername);
+            return authUsername;
         }
-
-        if (currentUsername == null) {
-            throw new UsernameNotFoundException("Username not found for current session!");
-        }
-
-        return currentUsername;
+        return null;
     }
 
     public static Collection<? extends GrantedAuthority> getAuthUserRoles() {

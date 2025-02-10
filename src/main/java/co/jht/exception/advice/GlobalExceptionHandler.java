@@ -2,6 +2,7 @@ package co.jht.exception.advice;
 
 import co.jht.exception.EmailAlreadyExistsException;
 import co.jht.exception.ErrorResponse;
+import co.jht.exception.UserAlreadyExistsException;
 import co.jht.exception.UserNotFoundException;
 import co.jht.util.DateTimeFormatterUtil;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,18 @@ import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Object> handleUserAlreadyExistsException(UserNotFoundException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(DateTimeFormatterUtil.getCurrentTokyoTime().toString());
+        errorResponse.setStatus(HttpStatus.CONFLICT.value());
+        errorResponse.setError(HttpStatus.CONFLICT.getReasonPhrase());
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setPath(request.getDescription(false).substring(4)); // Remove 'uri=' prefix
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {

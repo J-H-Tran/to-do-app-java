@@ -24,13 +24,16 @@ public class HttpsConfiguration {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
             @Override
             protected void postProcessContext(Context context) {
-                SecurityConstraint securityConstraint = new SecurityConstraint();
-                securityConstraint.setUserConstraint("CONFIDENTIAL");
+                SecurityConstraint constraint = new SecurityConstraint();
+                constraint.setUserConstraint("CONFIDENTIAL");
+
                 SecurityCollection collection = new SecurityCollection();
-                collection.addPattern("/auth/login");
-                collection.addPattern("/auth/register");
-                securityConstraint.addCollection(collection);
-                context.addConstraint(securityConstraint);
+                collection.addPattern("/login/**");
+                collection.addPattern("/register/**");
+
+                constraint.addCollection(collection);
+
+                context.addConstraint(constraint);
             }
         };
         tomcat.addAdditionalTomcatConnectors(redirectConnector());

@@ -50,7 +50,6 @@ public class TaskServiceImpl implements TaskService {
                 .stream()
                 .peek(task -> {
                     task.setCreationDate(task.getCreationDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
-
                     if (task.getDueDate() != null) {
                         task.setDueDate(task.getDueDate().withZoneSameInstant(ZoneId.of(ASIA_TOKYO)));
                     }
@@ -63,15 +62,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskItem createTask(TaskItem createTask) {
-        AppUser user = getLoginUser();
-        TaskItem task = new TaskItem();
-        task.setTaskCode(taskCodeGenerator.generateTaskCode());
-        task.setTitle(createTask.getTitle());
-        task.setDescription(createTask.getDescription());
-        task.setDueDate(createTask.getDueDate());
-        task.setCreationDate(DateTimeFormatterUtil.getCurrentTokyoTime());
-        task.setUser(user);
-        return taskRepository.save(task);
+        return taskRepository.save(createTaskDetails(createTask));
     }
 
     @Override
@@ -92,7 +83,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskItem updateTaskDueDate(Long taskId, ZonedDateTime dueDate) {
         Optional<TaskItem> taskOptional = taskRepository.findById(taskId);
-
         if (taskOptional.isPresent()) {
             TaskItem task = taskOptional.get();
             task.setDueDate(dueDate);
@@ -119,7 +109,20 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    private AppUser getLoginUser() {
+    private TaskItem createTaskDetails(TaskItem createTask) {
+        AppUser user = getLoginUserDetails();
+
+        TaskItem task = new TaskItem();
+        task.setTaskCode(taskCodeGenerator.generateTaskCode());
+        task.setTitle(createTask.getTitle());
+        task.setDescription(createTask.getDescription());
+        task.setDueDate(createTask.getDueDate());
+        task.setCreationDate(DateTimeFormatterUtil.getCurrentTokyoTime());
+        task.setUser(user);
+        return task;
+    }
+
+    private AppUser getLoginUserDetails() {
         return userRepository.findByUsername(AuthUserUtil.getAuthUsername());
     }
 
@@ -137,5 +140,4 @@ public class TaskServiceImpl implements TaskService {
         updatedTask.setUser(userRepository.findByUsername(username));
         return updatedTask;
     }
-
 }

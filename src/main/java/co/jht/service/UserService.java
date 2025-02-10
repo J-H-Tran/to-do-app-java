@@ -11,7 +11,8 @@ public interface UserService extends UserDetailsService {
     AppUser createUser(AppUser user);
     AppUser updateUser(AppUser user, String username);
     void deleteUser(String username);
-    void registerUser(AppUser user);
     AppUser findByUsername(String username);
+    void registerUser(AppUser user);
     String authenticateUser(AppUser user);
+    void logoutUser();
 }

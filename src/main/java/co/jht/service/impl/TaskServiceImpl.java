@@ -123,7 +123,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private AppUser getLoginUserDetails() {
-        return userRepository.findByUsername(AuthUserUtil.getAuthUsername());
+        return userRepository.findByUsername(AuthUserUtil.getAuthUsername()).orElse(null);
     }
 
     private TaskItem updateTaskDetails(TaskItem task) {
@@ -137,7 +137,7 @@ public class TaskServiceImpl implements TaskService {
         updatedTask.setDescription(task.getDescription());
         updatedTask.setDueDate(task.getDueDate());
         updatedTask.setCompleteStatus(task.getCompleteStatus());
-        updatedTask.setUser(userRepository.findByUsername(username));
+        updatedTask.setUser(userRepository.findByUsername(username).orElse(null));
         return updatedTask;
     }
 }

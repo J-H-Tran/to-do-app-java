@@ -1,7 +1,5 @@
-package co.jht.config.configserver;
+package co.jht.config;
 
-import co.jht.enums.UserRole;
-import co.jht.enums.UserStatus;
 import co.jht.generator.TaskCodeGenerator;
 import co.jht.model.domain.persist.appuser.AppUser;
 import co.jht.model.domain.persist.tasks.TaskItem;
@@ -51,15 +49,19 @@ public class DataInitializer {
     public void init() {
         jdbcTemplate.execute("CREATE SEQUENCE IF NOT EXISTS task_code_seq START 1");
         if (userRepository.count() == 0) {
-            createUser(username, userPassword, "admin@tda.com", "FirstAdmin", "LastAdmin", UserRole.ROLE_ADMIN);
-            createUser("regularUser", "regularPass", "regular@user.com", "FirstUser", "LastUser", UserRole.ROLE_USER);
-            createUser("guestUser", "guestPass", "regular@guest.com", "FirstUser", "LastUser", UserRole.ROLE_GUEST);
+            createUser(username, userPassword, "admin@tda.com");
+            createUser("modUser", "modPass", "admin@mod.com");
+            createUser("regularUser", "regularPass", "regular@user.com");
+            createUser("guestUser", "guestPass", "regular@guest.com");
+//            createUser(username, userPassword, "admin@tda.com", "FirstAdmin", "LastAdmin", UserRole.ROLE_ADMIN);
+//            createUser("regularUser", "regularPass", "regular@user.com", "FirstUser", "LastUser", UserRole.ROLE_USER);
+//            createUser("guestUser", "guestPass", "regular@guest.com", "FirstUser", "LastUser", UserRole.ROLE_GUEST);
         }
 
         if (taskRepository.count() == 0) {
-            AppUser adminUser = userRepository.findByUsername(username);
-            AppUser regularUser = userRepository.findByUsername("regularUser");
-            AppUser guestUser = userRepository.findByUsername("guestUser");
+            AppUser adminUser = userRepository.findByUsername(username).orElse(null);
+            AppUser regularUser = userRepository.findByUsername("regularUser").orElse(null);
+            AppUser guestUser = userRepository.findByUsername("guestUser").orElse(null);
 
             createTask("First Task", "Task description 1", DateTimeFormatterUtil.getCurrentTokyoTime(), regularUser);
             createTask("Second Task", "Task description 2", DateTimeFormatterUtil.getCurrentTokyoTime(), regularUser);
@@ -72,22 +74,19 @@ public class DataInitializer {
     private void createUser(
             String username,
             String password,
-            String email,
-            String firstName,
-            String lastName,
-            UserRole role
+            String email
     ) {
-        AppUser user = new AppUser();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setEmail(email);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setProfilePictureUrl("http://example.com/profile.jpg");
-        user.setRegistrationDate(DateTimeFormatterUtil.getCurrentTokyoTime());
-        user.setAccountStatus(UserStatus.ACTIVE);
-        user.setRole(role);
-        user.setVersion(0L);
+        AppUser user = new AppUser(username, passwordEncoder.encode(password), email);
+//        user.setUsername(username);
+//        user.setPassword(passwordEncoder.encode(password));
+//        user.setEmail(email);
+//        user.setFirstName(firstName);
+//        user.setLastName(lastName);
+//        user.setProfilePictureUrl("http://example.com/profile.jpg");
+//        user.setRegistrationDate(DateTimeFormatterUtil.getCurrentTokyoTime());
+//        user.setAccountStatus(UserStatus.ACTIVE);
+//        user.setRole(role);
+//        user.setVersion(0L);
 
         userRepository.save(user);
     }

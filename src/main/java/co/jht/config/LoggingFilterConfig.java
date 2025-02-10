@@ -13,7 +13,6 @@ public class LoggingFilterConfig {
         FilterRegistrationBean<LoggingFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new LoggingFilter());
         registrationBean.addUrlPatterns("/*");
-        registrationBean.setName("loggingFilter");
         registrationBean.setOrder(1); // Set the order of the filter
         return registrationBean;
     }

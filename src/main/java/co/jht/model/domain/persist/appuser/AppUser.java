@@ -1,8 +1,6 @@
 package co.jht.model.domain.persist.appuser;
 
 import co.jht.enums.UserRole;
-import co.jht.enums.UserStatus;
-import co.jht.util.DateTimeFormatterUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,22 +8,34 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.ZonedDateTime;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 
+import static co.jht.enums.UserRole.ROLE_ADMIN;
+import static co.jht.enums.UserRole.ROLE_GUEST;
+import static co.jht.enums.UserRole.ROLE_MODERATOR;
 import static co.jht.enums.UserRole.ROLE_USER;
-import static co.jht.enums.UserStatus.ACTIVE;
 
 @Entity
 @Table(name = "app_user_table")
-public class AppUser {
+@Getter
+@Setter
+public class AppUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -33,125 +43,79 @@ public class AppUser {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;
-
-    @Column(nullable = false)
-    private String profilePictureUrl = "http://default.jpg";
-
-    @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-    private ZonedDateTime registrationDate;
-
-    @Column(nullable = false)
-    private UserStatus accountStatus = ACTIVE;
-
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private UserRole role = ROLE_USER;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
+
+    @Column(name = "verification_expire", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private LocalDateTime verificationCodeExpiresAt;
+
+    @Column(name = "enabled")
+    private boolean enabled;
 
     @Version
     @Column(nullable = false)
     private Long version;
 
-    @PrePersist
-    public void prePersist() {
-        this.registrationDate = Objects.requireNonNullElseGet(
-                this.registrationDate,
-                DateTimeFormatterUtil::getCurrentTokyoTime
-        );
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
+    public AppUser(String email, String username, String password) {
         this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = switch (this.email.substring(this.email.indexOf('@'))) {
+            case "@tda.com" -> ROLE_ADMIN;
+            case "@mod.com" -> ROLE_MODERATOR;
+            case "@guest.com" -> ROLE_GUEST;
+            default -> ROLE_USER;
+        };
     }
 
-    public String getFirstName() {
-        return firstName;
+    public AppUser() {
+
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    @Override
+    public String getPassword() {
+        return this.password;
     }
 
-    public String getLastName() {
-        return lastName;
+    @Override
+    public String getUsername() {
+        return this.username;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        this.role = switch (this.email.substring(this.email.indexOf('@'))) {
+            case "@tda.com" -> ROLE_ADMIN;
+            case "@mod.com" -> ROLE_MODERATOR;
+            case "@guest.com" -> ROLE_GUEST;
+            default -> ROLE_USER;
+        };
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(this.role.name());
+        return Collections.singleton(grantedAuthority);
     }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
+    // Can use default impl for the below without needing to override
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public ZonedDateTime getRegistrationDate() {
-        return registrationDate;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public void setRegistrationDate(ZonedDateTime registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
-    public UserStatus getAccountStatus() {
-        return accountStatus;
-    }
-
-    public void setAccountStatus(UserStatus accountStatus) {
-        this.accountStatus = accountStatus;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }

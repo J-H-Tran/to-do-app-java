@@ -4,6 +4,9 @@ logging:
     path: logs
   level:
     root: INFO
+    org:
+      springframework:
+        security: DEBUG
 
 server:
   port: 8443
@@ -27,12 +30,13 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      idle-timeout: 30000
       pool-name: HikariPool-1
-      max-lifetime: 1800000
+      maximum-pool-size: 20
+      minimum-idle: 5
+      auto-commit: true
       connection-timeout: 30000
+      idle-timeout: 60000
+      max-lifetime: 1800000
   jpa:
     hibernate:
       ddl-auto: update
@@ -43,6 +47,17 @@ spring:
         transaction:
           jta:
             platform: org.springframework.transaction.jta.JtaTransactionManager
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   web:
     cors:
       allowed-origins: "*"
@@ -53,6 +68,13 @@ spring:
     user:
       name: ${SECURITY_USER_NAME}
       password: ${SECURITY_PASSWORD}
+  config:
+    import: "optional:classpath:.env[.properties]"
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-time: 3600
 
 springdoc:
   api-docs:
@@ -60,9 +82,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: 3600
 
 app:
   first-user:

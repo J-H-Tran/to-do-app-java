@@ -5,11 +5,17 @@ plugins {
 }
 
 group = 'co.jht'
-version = '1.0-SNAPSHOT'
+version = '1.0.0-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(23)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
     }
 }
 
@@ -18,43 +24,93 @@ repositories {
 }
 
 ext {
-    springDocVersion = '2.8.4'
-    jwtVersion = '0.12.5'
+    set('springCloudVersion', "2024.0.0")
+    set('springDocVersion', "2.8.4")
+    set('jwtVersion', "0.12.5")
 }
 
 dependencies {
     // SpringBoot
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+//    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+
+//    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+
+//    implementation 'com.okta.spring:okta-spring-boot-starter:3.0.7'
+
+    implementation 'org.springframework.cloud:spring-cloud-config-server'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway-mvc'
+    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+//    implementation 'org.springframework.session:spring-session-jdbc'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // JWT
+    implementation "io.jsonwebtoken:jjwt-api:${jwtVersion}"
+    implementation "io.jsonwebtoken:jjwt-impl:${jwtVersion}"
+    implementation "io.jsonwebtoken:jjwt-jackson:${jwtVersion}"
 
     // SpringDoc OpenAPI
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
     implementation "org.springdoc:springdoc-openapi-starter-common:${springDocVersion}"
 
-    // JUnit
-    testImplementation platform('org.junit:junit-bom:5.11.4')
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-
-    // Mockito
-    testImplementation 'org.mockito:mockito-core:5.14.2'
-
-    // PostgreSQL
-    implementation 'org.postgresql:postgresql:42.7.2'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
     // Hikari
     implementation 'com.zaxxer:HikariCP:6.2.1'
 
-    // JWT
-    implementation "io.jsonwebtoken:jjwt-api:${jwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jwtVersion}"
+    // PostgreSQL
+    implementation 'org.postgresql:postgresql:42.7.2'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // H2
+    runtimeOnly 'com.h2database:h2'
+
+    // JUnit
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Mockito
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test {

@@ -27,7 +27,8 @@ public class HttpsConfiguration {
                 SecurityConstraint securityConstraint = new SecurityConstraint();
                 securityConstraint.setUserConstraint("CONFIDENTIAL");
                 SecurityCollection collection = new SecurityCollection();
-                collection.addPattern("/auth/authenticate/**");
+                collection.addPattern("/auth/login");
+                collection.addPattern("/auth/register");
                 securityConstraint.addCollection(collection);
                 context.addConstraint(securityConstraint);
             }

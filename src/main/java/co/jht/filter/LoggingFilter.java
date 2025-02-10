@@ -1,4 +1,4 @@
-package co.jht.security.filter;
+package co.jht.filter;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

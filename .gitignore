@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 *.bat
 *.dtd
+*.env
 logs/*
 
 ### IntelliJ IDEA ###

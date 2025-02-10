@@ -1,14 +1,15 @@
 logging:
-  file:
-    name: logs/logs.txt
-    path: logs
   level:
     root: INFO
     org:
       springframework:
         security: DEBUG
+  file:
+    name: logs/logs.txt
+    path: logs
 
 server:
+  # Https port
   port: 8443
   ssl:
     enabled: true
@@ -17,9 +18,10 @@ server:
     key-store-password: password
     key-password: password
     key-alias: ode-https
+  # Http port, redirect to https via configuration
   http:
     port: 8080
-
+  # Exclude stack trace in error response
   error:
     include-stacktrace: never
 
@@ -47,6 +49,7 @@ spring:
         transaction:
           jta:
             platform: org.springframework.transaction.jta.JtaTransactionManager
+  # Java Send Mail Spring dependency via Google smtp protocol with app generated password
   mail:
     host: smtp.gmail.com
     port: 587
@@ -68,22 +71,33 @@ spring:
     user:
       name: ${SECURITY_USER_NAME}
       password: ${SECURITY_PASSWORD}
+  # Import .env file for properties values in src/main/resources
   config:
     import: "optional:classpath:.env[.properties]"
 
-security:
-  jwt:
-    secret: ${JWT_SECRET}
-    expiration-time: 3600
-
+# OpenAPI spring docs (Swagger)
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
 
-
+# Insert first user to PostgreSQL DB username and password fields
 app:
   first-user:
     name: ${FIRST_USER_NAME}
     password: ${FIRST_USER_PASSWORD}
+
+# Old implementation of Spring Security JWT Authentication config
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-time: 3600
+
+# Ifte implementation of Spring Security JWT Authentication config
+application:
+  security:
+    jwt:
+      secret-key:
+      access-token-expiration:
+      refresh-token-expiration:

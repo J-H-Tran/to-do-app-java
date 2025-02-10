@@ -1,6 +1,6 @@
 package co.jht.config;
 
-import co.jht.security.filter.LoggingFilter;
+import co.jht.filter.LoggingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

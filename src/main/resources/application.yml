@@ -40,12 +40,13 @@ spring:
       idle-timeout: 60000
       max-lifetime: 1800000
   jpa:
-    hibernate:
-      ddl-auto: update
+    hibernate: # create drop for development only
+      ddl-auto: create-drop
     show-sql: true
     open-in-view: false
     properties:
       hibernate:
+        format_sql: true
         transaction:
           jta:
             platform: org.springframework.transaction.jta.JtaTransactionManager
